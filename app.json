@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "slug": "OnDemandService",
+    "name": "OnDemandService",
+    "sdkVersion": "37.0.0",
+    "entryPoint": ".vscode\\exponentIndex.js"
+  },
+  "name": "OnDemandService",
+  "displayName": "OnDemandService"
+}
