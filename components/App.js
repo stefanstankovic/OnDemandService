@@ -1,6 +1,7 @@
 import React from 'react';
-import {StyleSheet, View, Image, Text, Icon} from 'react-native';
-import {Router, Scene, Tabs, Actions} from 'react-native-router-flux';
+import {StyleSheet, View, Image, Text} from 'react-native';
+import {Icon} from 'react-native-elements';
+import {Router, Scene, Stack} from 'react-native-router-flux';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
@@ -10,10 +11,6 @@ import HomePage from './home/HomePage';
 import MapPage from './home/MapPage';
 import NotificationsPage from './home/NotificationsPage';
 import {alertActions} from '../redux/actions/alert.actions';
-
-const homeImg = require('./images/home.png');
-const mapImg = require('./images/map.png');
-const notificationsImg = require('./images/notifications.png');
 
 const styles = StyleSheet.create({
   container: {
@@ -72,61 +69,67 @@ class App extends React.Component {
             component={LoginPage}
             initial={!this.props.loggedIn}
           />
-          <Scene
-            key="home-screen"
-            hideNavBar
-            lazy={true}
-            tabStyle={styles.tab}
-            swipeEnabled={false}
-            initial={this.props.loggedIn}>
-            <Tabs
+          <Stack hideNavBar initial={this.props.loggedIn}>
+            <Scene
               hideNavBar
-              showLabel={true}
-              lazy={true}
-              tabStyle={styles.tab}
+              key="home-screen"
+              tabs={true}
               tabBarStyle={styles.tabBar}
-              labelStyle={styles.label}
-              swipeEnabled={false}>
+              default="Main">
               <Scene
-                hideNavBar
                 key="home"
+                tabBarLabel="Home"
+                gesturesEnabled={false}
+                hideNavBar
                 component={HomePage}
-                icon={props => {
-                  let textColor = props.focused ? '#333333' : '#999999';
-                  const settingImageFocused = require('./images/home.png');
-                  const settingImageUnfocused = require('./images/home.png');
-                  let settingImage = props.focused
-                    ? settingImageFocused
-                    : settingImageUnfocused;
-                  let borderColor = props.focused ? '#333333' : '#FFFFFF';
+                icon={({focused}) => {
                   return (
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderTopColor: borderColor,
-                        borderTopWidth: 4,
-                        padding: 20,
-                      }}>
-                      <Image
-                        source={settingImage}
-                        style={{width: 20, height: 20}}
-                      />
-                      <Text style={{color: textColor}}>Settings</Text>
-                    </View>
+                    <Icon
+                      style={{width: 30}}
+                      type="antdesign"
+                      name={'home'}
+                      size={30}
+                      color={focused ? activeIconColor : iconColor}
+                    />
                   );
                 }}
               />
-              <Scene hideNavBar key="map" component={MapPage} />
+              <Scene
+                hideNavBar
+                key="map"
+                tabBarLabel="Map"
+                component={MapPage}
+                icon={({focused}) => {
+                  return (
+                    <Icon
+                      style={{width: 30}}
+                      type="entypo"
+                      name={'map'}
+                      size={30}
+                      color={focused ? activeIconColor : iconColor}
+                    />
+                  );
+                }}
+              />
               <Scene
                 hideNavBar
                 key="notifications"
+                tabBarLabel="Notifications"
                 component={NotificationsPage}
+                icon={({focused}) => {
+                  return (
+                    <Icon
+                      style={{width: 30}}
+                      type="antdesign"
+                      name={'notification'}
+                      size={30}
+                      color={focused ? activeIconColor : iconColor}
+                    />
+                  );
+                }}
               />
-            </Tabs>
-          </Scene>
+            </Scene>
+          </Stack>
           <Scene
             key="register"
             title="Register"
