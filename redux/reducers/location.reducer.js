@@ -1,9 +1,9 @@
 import * as types from '../actions/actionTypes';
 import initialState from './initialState';
 
-export function registration(state = initialState, action) {
+export function location(state = initialState, action) {
   switch (action.type) {
-    case types.LOCATION_CHANGES: {
+    case types.LOCATION_CHANGES:
       return {
         ...state,
         location: {
@@ -11,9 +11,7 @@ export function registration(state = initialState, action) {
           latitude: state.latitude,
         },
       };
-    }
-    default: {
+    default:
       return {...state};
-    }
   }
 }

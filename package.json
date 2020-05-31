@@ -7,15 +7,19 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "postinstall": "patch-package"
   },
   "dependencies": {
+    "@react-native-community/geolocation": "^2.0.2",
     "bindings": "^1.5.0",
     "fsevents": "^1.2.13",
     "history": "^4.10.1",
+    "patch-package": "^6.2.2",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-native": "^0.62.2",
+    "react-native-android-location-enabler": "^1.2.1",
     "react-native-dynamic-vector-icons": "^0.1.1",
     "react-native-elements": "^2.0.0",
     "react-native-gesture-handler": "^1.6.1",

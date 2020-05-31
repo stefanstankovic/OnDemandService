@@ -1,51 +1,17 @@
 import React from 'react';
-import {StyleSheet, View, Image, Text} from 'react-native';
-import {Icon} from 'react-native-elements';
 import {Router, Scene, Stack} from 'react-native-router-flux';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import LoginPage from './auth/LoginPage';
-import SignupPage from './auth/SignupPage';
+import {Icon} from 'react-native-elements';
+
 import HomePage from './home/HomePage';
 import MapPage from './home/MapPage';
 import NotificationsPage from './home/NotificationsPage';
+import LoginPage from './auth/LoginPage';
+import SignupPage from './auth/SignupPage';
 import {alertActions} from '../redux/actions/alert.actions';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scene: {
-    backgroundColor: '#F5FCFF',
-    shadowOpacity: 1,
-    shadowRadius: 3,
-  },
-  tabBarStyle: {
-    backgroundColor: '#eee',
-  },
-  tabBarSelectedItemStyle: {
-    backgroundColor: '#ddd',
-  },
-  tabBar: {
-    height: 50,
-    borderTopColor: 'darkgrey',
-    borderTopWidth: 1,
-    opacity: 0.98,
-    justifyContent: 'space-between',
-  },
-  activeLabel: {
-    color: '#c4e3cb',
-    textDecorationLine: 'underline',
-  },
-  label: {
-    fontSize: 20,
-    color: '#f4f9f4',
-  },
-});
+import styles from './common/styles';
 
 class App extends React.Component {
   constructor(props) {
@@ -56,9 +22,7 @@ class App extends React.Component {
     const activeIconColor = '#c4e3cb';
     const iconColor = '#f4f9f4';
     return (
-      <Router
-        sceneStyle={styles.scene}
-        selector={props => (!props.loggedIn ? 'login' : props.section)}>
+      <Router sceneStyle={styles.scene}>
         <Scene key="root">
           <Scene
             key="login"
@@ -85,7 +49,7 @@ class App extends React.Component {
                 icon={({focused}) => {
                   return (
                     <Icon
-                      style={{width: 30}}
+                      style={styles.icon}
                       type="antdesign"
                       name={'home'}
                       size={30}
@@ -102,7 +66,7 @@ class App extends React.Component {
                 icon={({focused}) => {
                   return (
                     <Icon
-                      style={{width: 30}}
+                      style={styles.icon}
                       type="entypo"
                       name={'map'}
                       size={30}
@@ -119,7 +83,7 @@ class App extends React.Component {
                 icon={({focused}) => {
                   return (
                     <Icon
-                      style={{width: 30}}
+                      style={styles.icon}
                       type="antdesign"
                       name={'notification'}
                       size={30}
