@@ -1,174 +1,284 @@
-// import EnterName from './App/Components/EnterName
-import React from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
+  ImageBackground,
+  LayoutAnimation,
+  UIManager,
   KeyboardAvoidingView,
-  ActivityIndicator,
-  Alert,
-  Image,
-  Dimensions,
 } from 'react-native';
+import {Input, Button, Icon} from 'react-native-elements';
 
-import PropTypes from 'prop-types';
-import {Actions} from 'react-native-router-flux';
-
-const unlockImg = require('../images/unlock.png');
-const loginImg = require('../images/login.png');
+const BG_IMAGE = require('../images/background.png');
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as userActions from '../../redux/actions/user.actions';
 
-const win = Dimensions.get('window');
-const ratio = win.width / 603; //603 is actual image width
+import styles from '../common/login.styles';
 
-class LoginPage extends React.Component {
+// Enable LayoutAnimation on Android
+UIManager.setLayoutAnimationEnabledExperimental &&
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+
+const TabSelector = ({selected}) => {
+  return (
+    <View style={styles.selectorContainer}>
+      <View style={selected && styles.selected} />
+    </View>
+  );
+};
+
+TabSelector.propTypes = {
+  selected: PropTypes.bool.isRequired,
+};
+
+class LoginPage extends Component {
   constructor(props) {
     super(props);
-    //this.onPressLearnMore = this.onPressLearnMore.bind(this);
-    this.callLogin = this.callLogin.bind(this);
-    this.onPressCreateAcc = this.onPressCreateAcc.bind(this);
+
     this.state = {
-      isShowingLoader: false,
-      username: '',
+      email: '',
       password: '',
-      isShowingWelcome: false,
+      phoneNumber: '',
+      isWorker: false,
+      selectedCategory: 0,
+      isLoading: false,
+      isEmailValid: true,
+      isPhoneValid: true,
+      isPasswordValid: true,
     };
+
+    this.selectCategory = this.selectCategory.bind(this);
+    this.login = this.login.bind(this);
+    this.signUp = this.signUp.bind(this);
   }
 
-  onPressCreateAcc = () => {
-    Actions.register();
-  };
+  selectCategory(selectedCategory) {
+    LayoutAnimation.easeInEaseOut();
+    this.setState({
+      selectedCategory,
+      isLoading: false,
+    });
+  }
 
-  callLogin = async () => {
-    const {loggedIn, actions} = this.props;
+  validateEmail(email) {
+    var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    if (this.state.username && this.state.password) {
-      this.setState({isShowingLoader: true});
+    return re.test(email);
+  }
 
-      try {
-        if (!loggedIn) {
-          actions.login(this.state.username, this.state.password);
-        }
-        this.setState({isShowingLoader: false});
-      } catch (error) {
-        console.log(error);
-        this.setState({isShowingLoader: false});
+  validPhone(phone) {
+    var re = /^(\+\d{1,3}[- ]?)?\d{10}$/;
 
-        Alert.alert(
-          'Error',
-          'Something went wrong!',
-          [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-          {cancelable: false},
-        );
-      }
-    } else {
-      Alert.alert(
-        'Error',
-        'Please enter required fields!',
-        [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-        {cancelable: false},
-      );
+    return re.test(phone);
+  }
+
+  login() {
+    const {email, password} = this.state;
+    this.setState({isLoading: true});
+
+    this.setState({
+      isEmailValid: this.validateEmail(email) || this.emailInput.shake(),
+      isPasswordValid: password.length >= 8 || this.passwordInput.shake(),
+    });
+
+    if (this.state.isEmailValid && this.state.password) {
+      this.props.actions.login(email, password);
     }
-  };
+
+    this.setState({
+      isLoading: false,
+    });
+  }
+
+  signUp() {
+    const {email, password, phoneNumber, isWorker} = this.state;
+    this.setState({isLoading: true});
+
+    this.setState({
+      isLoading: false,
+      isEmailValid: this.validateEmail(email) || this.emailInput.shake(),
+      isPasswordValid: password.length >= 8 || this.passwordInput.shake(),
+      isPhoneValid: this.validPhone(phoneNumber) || this.phoneNumber.shake(),
+    });
+    // Simulate an API call
+    setTimeout(() => {
+      LayoutAnimation.easeInEaseOut();
+    }, 1500);
+  }
 
   render() {
+    const {
+      selectedCategory,
+      isLoading,
+      isEmailValid,
+      isPasswordValid,
+      isPhoneValid,
+      email,
+      password,
+      phoneNumber,
+    } = this.state;
+    const isLoginPage = selectedCategory === 0;
+    const isSignUpPage = selectedCategory === 1;
+
     return (
-      <View>
-        <KeyboardAvoidingView behavior="position" disabled>
-          <View
-            style={{marginTop: 50, marginLeft: 'auto', marginRight: 'auto'}}>
-            <Image
-              style={{width: win.width, height: 166 * ratio}}
-              source={loginImg}
-            />
-          </View>
-
+      <View style={styles.container}>
+        <ImageBackground source={BG_IMAGE} style={styles.bgImage}>
           <View>
-            <TextInput
-              onChangeText={username => this.setState({username})}
-              style={style.inputs}
-              placeholder="Enter Username"
-            />
+            <KeyboardAvoidingView
+              contentContainerStyle={styles.loginContainer}
+              behavior="position">
+              <View style={styles.titleContainer}>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={styles.titleText}>ON DEMAND</Text>
+                </View>
+                <View style={{marginTop: -10, marginLeft: 10}}>
+                  <Text style={styles.titleText}>SERVICE</Text>
+                </View>
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <Button
+                  disabled={isLoading}
+                  type="clear"
+                  activeOpacity={0.7}
+                  onPress={() => this.selectCategory(0)}
+                  containerStyle={{flex: 1}}
+                  titleStyle={[
+                    styles.categoryText,
+                    isLoginPage && styles.selectedCategoryText,
+                  ]}
+                  title={'Login'}
+                />
+                <Button
+                  disabled={isLoading}
+                  type="clear"
+                  activeOpacity={0.7}
+                  onPress={() => this.selectCategory(1)}
+                  containerStyle={{flex: 1}}
+                  titleStyle={[
+                    styles.categoryText,
+                    isSignUpPage && styles.selectedCategoryText,
+                  ]}
+                  title={'Sign up'}
+                />
+              </View>
+              <View style={styles.rowSelector}>
+                <TabSelector selected={isLoginPage} />
+                <TabSelector selected={isSignUpPage} />
+              </View>
+              <View style={styles.formContainer}>
+                <Input
+                  leftIcon={
+                    <Icon
+                      name="envelope-o"
+                      type="font-awesome"
+                      color="rgba(0, 0, 0, 0.38)"
+                      size={25}
+                      style={styles.transparent}
+                    />
+                  }
+                  value={email}
+                  keyboardAppearance="light"
+                  autoFocus={false}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="email-address"
+                  returnKeyType="next"
+                  inputStyle={{marginLeft: 10}}
+                  placeholder={'Email'}
+                  containerStyle={{
+                    borderBottomColor: 'rgba(0, 0, 0, 0.38)',
+                  }}
+                  ref={input => (this.emailInput = input)}
+                  onSubmitEditing={() => this.passwordInput.focus()}
+                  onChangeText={email => this.setState({email})}
+                  errorMessage={
+                    isEmailValid ? null : 'Please enter a valid email address'
+                  }
+                />
+                <Input
+                  leftIcon={
+                    <Icon
+                      name="lock"
+                      type="simple-line-icon"
+                      color="rgba(0, 0, 0, 0.38)"
+                      size={25}
+                      style={styles.transparent}
+                    />
+                  }
+                  value={password}
+                  keyboardAppearance="light"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  secureTextEntry={true}
+                  returnKeyType={isSignUpPage ? 'next' : 'done'}
+                  blurOnSubmit={true}
+                  containerStyle={styles.inputContainerStyle}
+                  inputStyle={{marginLeft: 10}}
+                  placeholder={'Password'}
+                  ref={input => (this.passwordInput = input)}
+                  onSubmitEditing={() =>
+                    isSignUpPage ? this.confirmationInput.focus() : this.login()
+                  }
+                  onChangeText={password => this.setState({password})}
+                  errorMessage={
+                    isPasswordValid
+                      ? null
+                      : 'Please enter at least 8 characters'
+                  }
+                />
+                {isSignUpPage && (
+                  <>
+                    <Input
+                      leftIcon={
+                        <Icon
+                          type="antdesign"
+                          name="phone"
+                          color="rgba(0, 0, 0, 0.38)"
+                          size={25}
+                          style={styles.transparent}
+                        />
+                      }
+                      value={phoneNumber}
+                      secureTextEntry={true}
+                      keyboardAppearance="light"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      keyboardType="phone-pad"
+                      returnKeyType={'done'}
+                      blurOnSubmit={true}
+                      containerStyle={styles.inputContainerStyle}
+                      inputStyle={{marginLeft: 10}}
+                      placeholder={'Mobile'}
+                      ref={input => (this.phoneNumber = input)}
+                      onSubmitEditing={this.signUp}
+                      onChangeText={phoneNumber => this.setState({phoneNumber})}
+                      errorMessage={
+                        isPhoneValid ? null : 'Please enter valid mobile phone'
+                      }
+                    />
+                  </>
+                )}
+                <Button
+                  buttonStyle={styles.loginButton}
+                  containerStyle={{marginTop: 32, flex: 0}}
+                  activeOpacity={0.8}
+                  title={isLoginPage ? 'LOGIN' : 'SIGN UP'}
+                  onPress={isLoginPage ? this.login : this.signUp}
+                  titleStyle={styles.loginTextButton}
+                  loading={isLoading}
+                  disabled={isLoading}
+                />
+              </View>
+            </KeyboardAvoidingView>
           </View>
-
-          <View>
-            <TextInput
-              onChangeText={password => this.setState({password})}
-              secureTextEntry={true}
-              style={style.inputs}
-              placeholder="Enter Password"
-            />
-          </View>
-
-          {/* <View>
-          <Text style={{textAlign:'right',marginTop:10,marginRight:10}}
-          onPress={this.props.onPressForgotPass}>
-          Forgot Password? 
-          </Text>
-        </View>  */}
-
-          {/* own buttons design */}
-          <View style={[style.center, {marginTop: 20}]}>
-            {!this.state.isShowingLoader && (
-              <TouchableOpacity onPress={this.callLogin}>
-                <Text style={style.textButton}>Login</Text>
-              </TouchableOpacity>
-            )}
-            {this.state.isShowingLoader && <ActivityIndicator size="large" />}
-          </View>
-
-          <View style={style.center}>
-            <TouchableOpacity>
-              <Text
-                style={{textAlign: 'center', padding: 20, margin: 10}}
-                onPress={this.onPressCreateAcc}>
-                create an Account ?
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
+        </ImageBackground>
       </View>
     );
   }
 }
-const style = StyleSheet.create({
-  inputs: {
-    marginTop: 50,
-    color: 'red',
-    fontSize: 20,
-    marginLeft: 10,
-    marginRight: 10,
-    borderBottomColor: 'red',
-    borderBottomWidth: 2,
-  },
-  title: {
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 50,
-    fontSize: 30,
-    fontWeight: 'bold',
-  },
-  center: {
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
-  textButton: {
-    width: 140,
-    padding: 10,
-    fontSize: 20,
-    marginLeft: 10,
-    fontWeight: 'bold',
-    borderRadius: 30,
-    color: 'white',
-    textAlign: 'center',
-    backgroundColor: 'green',
-  },
-});
 
 LoginPage.propTypes = {
   loggedIn: PropTypes.bool.isRequired,

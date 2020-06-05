@@ -10,11 +10,11 @@ export const userActions = {
   getAll,
 };
 
-export function login(username, password) {
+export function login(email, password) {
   return dispatch => {
-    dispatch(request({username}));
+    dispatch(request({email}));
 
-    userService.login(username, password).then(
+    userService.login(email, password).then(
       user => {
         dispatch(success(user));
         history.push('/');
@@ -29,8 +29,12 @@ export function login(username, password) {
   function request(user) {
     return {type: types.LOGIN_REQUEST, user};
   }
-  function success(user) {
-    return {type: types.LOGIN_SUCCESS, user};
+  function success(response) {
+    return {
+      type: types.LOGIN_SUCCESS,
+      user: response.user,
+      token: response.token,
+    };
   }
   function failure(error) {
     return {type: types.LOGIN_FAILURE, error};

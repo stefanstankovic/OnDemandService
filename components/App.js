@@ -9,7 +9,6 @@ import HomePage from './home/HomePage';
 import MapPage from './home/MapPage';
 import NotificationsPage from './home/NotificationsPage';
 import LoginPage from './auth/LoginPage';
-import SignupPage from './auth/SignupPage';
 import {alertActions} from '../redux/actions/alert.actions';
 import styles from './common/styles';
 
@@ -94,14 +93,6 @@ class App extends React.Component {
               />
             </Scene>
           </Stack>
-          <Scene
-            key="register"
-            title="Register"
-            hideTabBar={true}
-            hideNavBar={true}
-            path="/signup"
-            component={SignupPage}
-          />
         </Scene>
       </Router>
     );

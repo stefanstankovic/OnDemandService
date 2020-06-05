@@ -1,6 +1,6 @@
 import {TouchableOpacity, Dimensions, Text, View} from 'react-native';
 import React, {Component} from 'react';
-import MapView from 'react-native-maps';
+import MapView, {Marker, Polyline, PROVIDER_GOOGLE} from 'react-native-maps';
 
 import {connect} from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
@@ -13,7 +13,7 @@ import * as constants from '../common/constants';
 class MapPage extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {polyline: []};
 
     this.getPermissions();
   }
@@ -56,15 +56,37 @@ class MapPage extends Component {
   }
 
   componentDidMount() {
-    this.watchID = Geolocation.watchPosition(({coords}) => {
-      const {lat, long} = coords;
-      this.setState({
-        position: {
-          lat,
-          long,
-        },
-      });
-    });
+    this.watchID = Geolocation.watchPosition(
+      ({coords}) => {
+        const {latitude, longitude} = coords;
+        console.log('Location changed');
+        let polyline = [...this.state.polyline];
+        polyline.push({
+          latitude: latitude,
+          longitude: longitude,
+        });
+        this.setState({
+          position: {
+            latitude,
+            longitude,
+          },
+          markers: [
+            {
+              latitude: latitude,
+              longitude: longitude,
+            },
+          ],
+          polyline,
+        });
+
+        this.getPermissions();
+      },
+      error => alert(JSON.stringify(error)),
+      {
+        distanceFilter: 100,
+        enableHighAccuracy: true,
+      },
+    );
   }
 
   componentWillUnmount() {
@@ -91,6 +113,14 @@ class MapPage extends Component {
       };
     };
 
+    let polyline;
+
+    if (this.state.polyline.length > 5) {
+      polyline = (
+        <Polyline key="polyiline1" coordinates={this.state.polyline} />
+      );
+    }
+
     return (
       <View style={styles.mapContainer}>
         <View style={bbStyle(varTop)}>
@@ -103,10 +133,27 @@ class MapPage extends Component {
           </TouchableOpacity>
         </View>
         <MapView
+          provider={PROVIDER_GOOGLE}
           style={styles.map}
           region={this.state.region}
-          showsUserLocation={true}
-        />
+          showsUserLocation={true}>
+          {this.state.markers !== undefined &&
+            this.state.markers.map((marker, index) => {
+              return (
+                <Marker
+                  key={'index' + index}
+                  draggable
+                  coordinate={marker}
+                  onDragEnd={e =>
+                    alert(JSON.stringify(e.nativeEvent.coordinate))
+                  }
+                  title={'Test Marker'}
+                  description={'This is a description of the marker'}
+                />
+              );
+            })}
+          {polyline}
+        </MapView>
       </View>
     );
   }
