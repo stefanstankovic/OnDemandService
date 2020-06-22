@@ -1,19 +1,12 @@
-import React, {Component} from 'react';
-import {
-  Text,
-  View,
-  StyleSheet,
-  Image,
-  Animated,
-  Platform,
-  FlatList,
-} from 'react-native';
+import React, {Component, useContext} from 'react';
+import {View, Image, Animated, FlatList} from 'react-native';
 
 import {connect} from 'react-redux';
 import {Header} from 'react-native-elements';
 
 import styles from '../common/styles';
 import * as constants from '../common/constants';
+
 const data = [
   {
     image:

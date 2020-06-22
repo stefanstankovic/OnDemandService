@@ -1,6 +1,5 @@
 import {authHeader} from '../helpers/auth-helper';
-
-const api_url = 'http:/192.168.1.15:3000';
+import {API_BASE} from '../config';
 
 export const userService = {
   login,
@@ -19,7 +18,7 @@ function login(email, password) {
     body: JSON.stringify({email: email, password: password}),
   };
 
-  return fetch(`${api_url}/user/login`, requestOptions)
+  return fetch(`${API_BASE}/user/login`, requestOptions)
     .then(response => {
       if (!response.ok) {
         return Promise.reject(response.statusText);
@@ -66,7 +65,7 @@ function register(user) {
     body: JSON.stringify(user),
   };
 
-  return fetch(`${api_url}/user/signup`, requestOptions).then(handleResponse);
+  return fetch(`${API_BASE}/user/signup`, requestOptions).then(handleResponse);
 }
 
 function update(user) {
