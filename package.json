@@ -8,12 +8,11 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
-    "postinstall": "patch-package"
+    "postinstall": "node ./node_modules/patch-package"
   },
   "dependencies": {
     "@react-native-community/geolocation": "^2.0.2",
     "bindings": "^1.5.0",
-    "fsevents": "^1.2.13",
     "history": "^4.10.1",
     "patch-package": "^6.2.2",
     "prop-types": "^15.7.2",
@@ -33,7 +32,8 @@
     "react-redux": "^7.2.0",
     "redux": "^4.0.5",
     "redux-immutable-state-invariant": "^2.1.0",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "socket.io-client": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "7.9.6",

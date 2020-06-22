@@ -19,3 +19,7 @@ export const ALERT_ERROR = 'ALERT_ERROR';
 export const ALERT_CLEAR = 'ALERT_CLEAR';
 
 export const LOCATION_CHANGES = 'LOCATION_CHANGES';
+
+export const ALL_WORKERS = 'ALL_WORKERS';
+export const WORKER_LOGGED_OUT = 'WORKER_LOGGED_OUT';
+export const WORKER_LOGGED_IN = 'WORKER_LOGGED_IN';

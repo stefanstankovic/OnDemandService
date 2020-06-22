@@ -1,4 +1,5 @@
 import {authHeader} from '../helpers/auth-helper';
+import {API_BASE} from '../config';
 
 export const userService = {
   login,
@@ -10,14 +11,14 @@ export const userService = {
   delete: _delete,
 };
 
-function login(username, password) {
+function login(email, password) {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({username, password}),
+    body: JSON.stringify({email: email, password: password}),
   };
 
-  return fetch('/users/authenticate', requestOptions)
+  return fetch(`${API_BASE}/user/login`, requestOptions)
     .then(response => {
       if (!response.ok) {
         return Promise.reject(response.statusText);
@@ -26,10 +27,8 @@ function login(username, password) {
       return response.json();
     })
     .then(user => {
-      // login successful if there's a jwt token in the response
-      if (user && user.token) {
-        // store user details and jwt token in local storage to keep user logged in between page refreshes
-        //localStorage.setItem('user', JSON.stringify(user));
+      if (!user.success) {
+        return Promise.reject(user.message);
       }
 
       return user;
@@ -47,7 +46,7 @@ function getAll() {
     headers: authHeader(),
   };
 
-  return fetch('/users', requestOptions).then(handleResponse);
+  return fetch('/user/users', requestOptions).then(handleResponse);
 }
 
 function getById(id) {
@@ -66,7 +65,7 @@ function register(user) {
     body: JSON.stringify(user),
   };
 
-  return fetch('/users/register', requestOptions).then(handleResponse);
+  return fetch(`${API_BASE}/user/signup`, requestOptions).then(handleResponse);
 }
 
 function update(user) {

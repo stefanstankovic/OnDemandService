@@ -6,9 +6,10 @@ export function authentication(state = initialState, action) {
     case types.LOGIN_REQUEST:
       return {...state};
     case types.LOGIN_SUCCESS:
-      return {...state, loggedIn: true, user: action.user};
+      console.log(JSON.stringify(action));
+      return {...state, loggedIn: true, user: action.user, token: action.token};
     case types.LOGIN_FAILURE:
-      return {...state, loggedIn: true};
+      return {...state, loggedIn: false};
     case types.LOGOUT:
       return {...state, loggedIn: false, user: undefined};
     default:
