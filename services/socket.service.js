@@ -35,6 +35,10 @@ export default class SocketService {
     }
   }
 
+  disconnetFromSocket() {
+    this.socket.disconnect();
+  }
+
   getSocket() {
     if (this.socket) {
       return this.socket;
@@ -51,13 +55,5 @@ export default class SocketService {
     */
 
     return this.socket;
-  }
-
-  getUserID() {
-    return this._userID;
-  }
-
-  setUserID(id) {
-    this._userID = id;
   }
 }

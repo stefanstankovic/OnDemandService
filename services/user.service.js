@@ -19,19 +19,13 @@ function login(email, password) {
   };
 
   return fetch(`${API_BASE}/user/login`, requestOptions)
+    .then(handleResponse)
     .then(response => {
-      if (!response.ok) {
-        return Promise.reject(response.statusText);
+      if (!response.success) {
+        return Promise.reject(response.message);
       }
 
-      return response.json();
-    })
-    .then(user => {
-      if (!user.success) {
-        return Promise.reject(user.message);
-      }
-
-      return user;
+      return response;
     });
 }
 
@@ -65,7 +59,15 @@ function register(user) {
     body: JSON.stringify(user),
   };
 
-  return fetch(`${API_BASE}/user/signup`, requestOptions).then(handleResponse);
+  return fetch(`${API_BASE}/user/signup`, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      if (!response.success) {
+        return Promise.reject(response.message);
+      }
+
+      return response;
+    });
 }
 
 function update(user) {
@@ -88,7 +90,7 @@ function _delete(id) {
   return fetch('/users/' + id, requestOptions).then(handleResponse);
 }
 
-function handleResponse(response) {
+async function handleResponse(response) {
   if (!response.ok) {
     return Promise.reject(response.statusText);
   }

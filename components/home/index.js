@@ -7,6 +7,7 @@ import {Icon} from 'react-native-elements';
 import HomePage from './HomePage';
 import MapPage from './MapPage';
 import NotificationsPage from './NotificationsPage';
+import ExitDialog from '../common/ExitDialog';
 
 import styles from '../common/styles';
 
@@ -24,81 +25,90 @@ class Home extends Component {
     }
   }
 
+  componentWillUnmount() {
+    if (this.props.loggedIn) {
+      SocketService.getInstance().disconnetFromSocket();
+    }
+  }
+
   render() {
     const activeIconColor = '#c4e3cb';
     const iconColor = '#f4f9f4';
     return (
-      <Router>
-        <Stack hideNavBar>
-          <Scene
-            hideNavBar
-            key="home-screen"
-            tabs={true}
-            tabBarStyle={styles.tabBar}
-            default="Main">
-            <Scene
-              key="home"
-              tabBarLabel="Home"
-              gesturesEnabled={false}
-              hideNavBar
-              component={HomePage}
-              icon={({focused}) => {
-                return (
-                  <Icon
-                    style={styles.icon}
-                    type="antdesign"
-                    name={'home'}
-                    size={30}
-                    color={focused ? activeIconColor : iconColor}
-                  />
-                );
-              }}
-            />
+      <>
+        <Router>
+          <Stack hideNavBar>
             <Scene
               hideNavBar
-              key="map"
-              tabBarLabel="Map"
-              component={MapPage}
-              icon={({focused}) => {
-                return (
-                  <Icon
-                    style={styles.icon}
-                    type="entypo"
-                    name={'map'}
-                    size={30}
-                    color={focused ? activeIconColor : iconColor}
-                  />
-                );
-              }}
-            />
-            <Scene
-              hideNavBar
-              key="notifications"
-              tabBarLabel="Notifications"
-              component={NotificationsPage}
-              icon={({focused}) => {
-                return (
-                  <Icon
-                    style={styles.icon}
-                    type="antdesign"
-                    name={'notification'}
-                    size={30}
-                    color={focused ? activeIconColor : iconColor}
-                  />
-                );
-              }}
-            />
-          </Scene>
-        </Stack>
-      </Router>
+              key="home-screen"
+              tabs={true}
+              tabBarStyle={styles.tabBar}
+              default="Main">
+              <Scene
+                key="home"
+                tabBarLabel="Home"
+                gesturesEnabled={false}
+                hideNavBar
+                component={HomePage}
+                icon={({focused}) => {
+                  return (
+                    <Icon
+                      style={styles.icon}
+                      type="antdesign"
+                      name={'home'}
+                      size={30}
+                      color={focused ? activeIconColor : iconColor}
+                    />
+                  );
+                }}
+              />
+              <Scene
+                hideNavBar
+                key="map"
+                tabBarLabel="Map"
+                component={MapPage}
+                icon={({focused}) => {
+                  return (
+                    <Icon
+                      style={styles.icon}
+                      type="entypo"
+                      name={'map'}
+                      size={30}
+                      color={focused ? activeIconColor : iconColor}
+                    />
+                  );
+                }}
+              />
+              <Scene
+                hideNavBar
+                key="notifications"
+                tabBarLabel="Notifications"
+                component={NotificationsPage}
+                icon={({focused}) => {
+                  return (
+                    <Icon
+                      style={styles.icon}
+                      type="antdesign"
+                      name={'notification'}
+                      size={30}
+                      color={focused ? activeIconColor : iconColor}
+                    />
+                  );
+                }}
+              />
+            </Scene>
+          </Stack>
+        </Router>
+        <ExitDialog />
+      </>
     );
   }
 }
 
 function mapStateToProps(state) {
   return {
-    authToken: state.authentication.token,
-    loggedIn: state.authentication.loggedIn,
+    authToken: state.user.token,
+    loggedIn: state.user.loggedIn,
   };
 }
 
