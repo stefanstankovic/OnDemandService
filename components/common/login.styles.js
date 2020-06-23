@@ -4,6 +4,9 @@ import * as constants from './constants';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   rowSelector: {
     height: 20,
@@ -26,6 +29,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   loginContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -93,6 +97,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     borderBottomColor: 'rgba(0, 0, 0, 0.38)',
   },
+  groupButton: {height: 35},
 });
 
 export default styles;

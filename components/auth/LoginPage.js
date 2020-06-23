@@ -7,8 +7,9 @@ import {
   LayoutAnimation,
   UIManager,
   KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
-import {Input, Button, Icon} from 'react-native-elements';
+import {Input, Button, Icon, ButtonGroup} from 'react-native-elements';
 
 const BG_IMAGE = require('../images/background.png');
 
@@ -42,7 +43,7 @@ class LoginPage extends Component {
       email: '',
       password: '',
       phoneNumber: '',
-      isWorker: false,
+      isWorker: 0,
       selectedCategory: 0,
       isLoading: false,
       isEmailValid: true,
@@ -53,6 +54,7 @@ class LoginPage extends Component {
     this.selectCategory = this.selectCategory.bind(this);
     this.login = this.login.bind(this);
     this.signUp = this.signUp.bind(this);
+    this.updateIsWorker = this.updateIsWorker.bind(this);
   }
 
   selectCategory(selectedCategory) {
@@ -69,8 +71,12 @@ class LoginPage extends Component {
     return re.test(email);
   }
 
+  updateIsWorker = index => {
+    this.setState({isWorker: index});
+  };
+
   validPhone(phone) {
-    var re = /^(\+\d{1,3}[- ]?)?\d{10}$/;
+    var re = /^(\+\d{1,3}[- ]?)?\d{5,10}$/;
 
     return re.test(phone);
   }
@@ -103,10 +109,13 @@ class LoginPage extends Component {
       isPasswordValid: password.length >= 8 || this.passwordInput.shake(),
       isPhoneValid: this.validPhone(phoneNumber) || this.phoneNumber.shake(),
     });
-    // Simulate an API call
-    setTimeout(() => {
-      LayoutAnimation.easeInEaseOut();
-    }, 1500);
+
+    this.props.actions.register({
+      email: email,
+      mobile: phoneNumber,
+      password: password,
+      role: isWorker === 1 ? 'worker' : 'user',
+    });
   }
 
   render() {
@@ -123,159 +132,163 @@ class LoginPage extends Component {
     const isLoginPage = selectedCategory === 0;
     const isSignUpPage = selectedCategory === 1;
 
+    const component1 = () => <Text>User</Text>;
+    const component2 = () => <Text>Worker</Text>;
+    const buttons = [{element: component1}, {element: component2}];
+
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container}>
         <ImageBackground source={BG_IMAGE} style={styles.bgImage}>
-          <View>
-            <KeyboardAvoidingView
-              contentContainerStyle={styles.loginContainer}
-              behavior="position">
-              <View style={styles.titleContainer}>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={styles.titleText}>ON DEMAND</Text>
-                </View>
-                <View style={{marginTop: -10, marginLeft: 10}}>
-                  <Text style={styles.titleText}>SERVICE</Text>
-                </View>
-              </View>
+          <ScrollView contentContainerStyle={styles.loginContainer}>
+            <View style={styles.titleContainer}>
               <View style={{flexDirection: 'row'}}>
-                <Button
-                  disabled={isLoading}
-                  type="clear"
-                  activeOpacity={0.7}
-                  onPress={() => this.selectCategory(0)}
-                  containerStyle={{flex: 1}}
-                  titleStyle={[
-                    styles.categoryText,
-                    isLoginPage && styles.selectedCategoryText,
-                  ]}
-                  title={'Login'}
-                />
-                <Button
-                  disabled={isLoading}
-                  type="clear"
-                  activeOpacity={0.7}
-                  onPress={() => this.selectCategory(1)}
-                  containerStyle={{flex: 1}}
-                  titleStyle={[
-                    styles.categoryText,
-                    isSignUpPage && styles.selectedCategoryText,
-                  ]}
-                  title={'Sign up'}
-                />
+                <Text style={styles.titleText}>ON DEMAND</Text>
               </View>
-              <View style={styles.rowSelector}>
-                <TabSelector selected={isLoginPage} />
-                <TabSelector selected={isSignUpPage} />
+              <View style={{marginTop: -10, marginLeft: 10}}>
+                <Text style={styles.titleText}>SERVICE</Text>
               </View>
-              <View style={styles.formContainer}>
-                <Input
-                  leftIcon={
-                    <Icon
-                      name="envelope-o"
-                      type="font-awesome"
-                      color="rgba(0, 0, 0, 0.38)"
-                      size={25}
-                      style={styles.transparent}
-                    />
-                  }
-                  value={email}
-                  keyboardAppearance="light"
-                  autoFocus={false}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  keyboardType="email-address"
-                  returnKeyType="next"
-                  inputStyle={{marginLeft: 10}}
-                  placeholder={'Email'}
-                  containerStyle={{
-                    borderBottomColor: 'rgba(0, 0, 0, 0.38)',
-                  }}
-                  ref={input => (this.emailInput = input)}
-                  onSubmitEditing={() => this.passwordInput.focus()}
-                  onChangeText={email => this.setState({email})}
-                  errorMessage={
-                    isEmailValid ? null : 'Please enter a valid email address'
-                  }
-                />
-                <Input
-                  leftIcon={
-                    <Icon
-                      name="lock"
-                      type="simple-line-icon"
-                      color="rgba(0, 0, 0, 0.38)"
-                      size={25}
-                      style={styles.transparent}
-                    />
-                  }
-                  value={password}
-                  keyboardAppearance="light"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  secureTextEntry={true}
-                  returnKeyType={isSignUpPage ? 'next' : 'done'}
-                  blurOnSubmit={true}
-                  containerStyle={styles.inputContainerStyle}
-                  inputStyle={{marginLeft: 10}}
-                  placeholder={'Password'}
-                  ref={input => (this.passwordInput = input)}
-                  onSubmitEditing={() =>
-                    isSignUpPage ? this.confirmationInput.focus() : this.login()
-                  }
-                  onChangeText={password => this.setState({password})}
-                  errorMessage={
-                    isPasswordValid
-                      ? null
-                      : 'Please enter at least 8 characters'
-                  }
-                />
-                {isSignUpPage && (
-                  <>
-                    <Input
-                      leftIcon={
-                        <Icon
-                          type="antdesign"
-                          name="phone"
-                          color="rgba(0, 0, 0, 0.38)"
-                          size={25}
-                          style={styles.transparent}
-                        />
-                      }
-                      value={phoneNumber}
-                      secureTextEntry={true}
-                      keyboardAppearance="light"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      keyboardType="phone-pad"
-                      returnKeyType={'done'}
-                      blurOnSubmit={true}
-                      containerStyle={styles.inputContainerStyle}
-                      inputStyle={{marginLeft: 10}}
-                      placeholder={'Mobile'}
-                      ref={input => (this.phoneNumber = input)}
-                      onSubmitEditing={this.signUp}
-                      onChangeText={phoneNumber => this.setState({phoneNumber})}
-                      errorMessage={
-                        isPhoneValid ? null : 'Please enter valid mobile phone'
-                      }
-                    />
-                  </>
-                )}
-                <Button
-                  buttonStyle={styles.loginButton}
-                  containerStyle={{marginTop: 32, flex: 0}}
-                  activeOpacity={0.8}
-                  title={isLoginPage ? 'LOGIN' : 'SIGN UP'}
-                  onPress={isLoginPage ? this.login : this.signUp}
-                  titleStyle={styles.loginTextButton}
-                  loading={isLoading}
-                  disabled={isLoading}
-                />
-              </View>
-            </KeyboardAvoidingView>
-          </View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <Button
+                disabled={isLoading}
+                type="clear"
+                activeOpacity={0.7}
+                onPress={() => this.selectCategory(0)}
+                containerStyle={{flex: 1}}
+                titleStyle={[
+                  styles.categoryText,
+                  isLoginPage && styles.selectedCategoryText,
+                ]}
+                title={'Login'}
+              />
+              <Button
+                disabled={isLoading}
+                type="clear"
+                activeOpacity={0.7}
+                onPress={() => this.selectCategory(1)}
+                containerStyle={{flex: 1}}
+                titleStyle={[
+                  styles.categoryText,
+                  isSignUpPage && styles.selectedCategoryText,
+                ]}
+                title={'Sign up'}
+              />
+            </View>
+            <View style={styles.rowSelector}>
+              <TabSelector selected={isLoginPage} />
+              <TabSelector selected={isSignUpPage} />
+            </View>
+            <View style={styles.formContainer}>
+              <Input
+                leftIcon={
+                  <Icon
+                    name="envelope-o"
+                    type="font-awesome"
+                    color="rgba(0, 0, 0, 0.38)"
+                    size={25}
+                    style={styles.transparent}
+                  />
+                }
+                value={email}
+                keyboardAppearance="light"
+                autoFocus={false}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+                returnKeyType="next"
+                inputStyle={{marginLeft: 10}}
+                placeholder={'Email'}
+                containerStyle={{
+                  borderBottomColor: 'rgba(0, 0, 0, 0.38)',
+                }}
+                ref={input => (this.emailInput = input)}
+                onSubmitEditing={() => this.passwordInput.focus()}
+                onChangeText={email => this.setState({email})}
+                errorMessage={
+                  isEmailValid ? null : 'Please enter a valid email address'
+                }
+              />
+              <Input
+                leftIcon={
+                  <Icon
+                    name="lock"
+                    type="simple-line-icon"
+                    color="rgba(0, 0, 0, 0.38)"
+                    size={25}
+                    style={styles.transparent}
+                  />
+                }
+                value={password}
+                keyboardAppearance="light"
+                autoCapitalize="none"
+                autoCorrect={false}
+                secureTextEntry={true}
+                returnKeyType={isSignUpPage ? 'next' : 'done'}
+                blurOnSubmit={true}
+                containerStyle={styles.inputContainerStyle}
+                inputStyle={{marginLeft: 10}}
+                placeholder={'Password'}
+                ref={input => (this.passwordInput = input)}
+                onSubmitEditing={() =>
+                  isSignUpPage ? this.confirmationInput.focus() : this.login()
+                }
+                onChangeText={password => this.setState({password})}
+                errorMessage={
+                  isPasswordValid ? null : 'Please enter at least 8 characters'
+                }
+              />
+              {isSignUpPage && (
+                <>
+                  <Input
+                    leftIcon={
+                      <Icon
+                        type="antdesign"
+                        name="phone"
+                        color="rgba(0, 0, 0, 0.38)"
+                        size={25}
+                        style={styles.transparent}
+                      />
+                    }
+                    value={phoneNumber}
+                    secureTextEntry={true}
+                    keyboardAppearance="light"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    keyboardType="phone-pad"
+                    returnKeyType={'done'}
+                    blurOnSubmit={true}
+                    containerStyle={styles.inputContainerStyle}
+                    inputStyle={{marginLeft: 10}}
+                    placeholder={'Mobile'}
+                    ref={input => (this.phoneNumber = input)}
+                    onSubmitEditing={this.signUp}
+                    onChangeText={phoneNumber => this.setState({phoneNumber})}
+                    errorMessage={
+                      isPhoneValid ? null : 'Please enter valid mobile phone'
+                    }
+                  />
+                  <ButtonGroup
+                    onPress={this.updateIsWorker}
+                    selectedIndex={this.state.isWorker}
+                    buttons={buttons}
+                    containerStyle={styles.groupButton}
+                  />
+                </>
+              )}
+              <Button
+                buttonStyle={styles.loginButton}
+                containerStyle={{marginTop: 32, flex: 0}}
+                activeOpacity={0.8}
+                title={isLoginPage ? 'LOGIN' : 'SIGN UP'}
+                onPress={isLoginPage ? this.login : this.signUp}
+                titleStyle={styles.loginTextButton}
+                loading={isLoading}
+                disabled={isLoading}
+              />
+            </View>
+          </ScrollView>
         </ImageBackground>
-      </View>
+      </KeyboardAvoidingView>
     );
   }
 }
@@ -288,8 +301,8 @@ LoginPage.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    loggedIn: state.authentication.loggedIn,
-    user: state.authentication.user,
+    loggedIn: state.user.loggedIn,
+    user: state.user.user,
   };
 }
 
@@ -298,6 +311,7 @@ function mapDispatchToProps(dispatch) {
     actions: {
       login: bindActionCreators(userActions.login, dispatch),
       logout: bindActionCreators(userActions.logout, dispatch),
+      register: bindActionCreators(userActions.register, dispatch),
     },
   };
 }

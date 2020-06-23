@@ -42,7 +42,7 @@ export function login(email, password) {
 }
 
 export function logout() {
-  userService.logout();
+  //userService.logout();
   return {type: types.LOGOUT};
 }
 
@@ -52,7 +52,7 @@ export function register(user) {
 
     userService.register(user).then(
       user => {
-        dispatch(success());
+        dispatch(success(user));
         history.push('/login');
         dispatch(alertActions.success('Registration successful'));
       },

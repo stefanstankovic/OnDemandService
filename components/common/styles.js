@@ -110,6 +110,27 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     zIndex: 10,
   },
+  exitAnimatedView: {
+    width: constants.SCREEN_WIDTH,
+    backgroundColor: '#0a5386',
+    elevation: 2,
+    position: 'absolute',
+    bottom: 0,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  exitTitleText: {
+    textAlign: 'center',
+    color: '#ffffff',
+    marginRight: 10,
+  },
+  exitText: {
+    color: '#e5933a',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
 });
 
 export default styles;
