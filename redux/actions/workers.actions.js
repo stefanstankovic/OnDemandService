@@ -1,4 +1,6 @@
 import * as types from './actionTypes';
+import {workerService} from '../../services/worker.service';
+import {alertActions} from './alert.actions';
 
 export const workersActions = {
   allWorkers,
@@ -6,14 +8,44 @@ export const workersActions = {
   workerLoggedIn,
 };
 
-export function allWorkers(workers) {
-  return {type: types.ALL_WORKERS, workers: workers};
+function allWorkers(token) {
+  return dispatch => {
+    dispatch(request());
+
+    workerService.getAll(token).then(
+      response => {
+        if (!response.success) {
+          dispatch(failure(response.message));
+          dispatch(alertActions.error(response.message));
+        }
+
+        dispatch(success(response.workers));
+      },
+      error => {
+        dispatch(failure(error));
+        dispatch(alertActions.error(error));
+      },
+    );
+  };
+
+  function request() {
+    return {type: types.ALL_WORKERS_REQUEST};
+  }
+  function success(workers) {
+    return {
+      type: types.ALL_WORKERS_SUCCESS,
+      workers: workers,
+    };
+  }
+  function failure(error) {
+    return {type: types.ALL_WORKERS_FAILURE, error};
+  }
 }
 
-export function workerLoggedOut(worker) {
+function workerLoggedOut(worker) {
   return {type: types.WORKER_LOGGED_OUT, worker: worker};
 }
 
-export function workerLoggedIn(worker) {
+function workerLoggedIn(worker) {
   return {type: types.WORKER_LOGGED_IN, worker: worker};
 }

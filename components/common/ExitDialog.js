@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {BackHandler, Animated, TouchableOpacity, Text} from 'react-native';
+import {Actions} from 'react-native-router-flux';
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -54,13 +55,20 @@ class ExitDialog extends Component {
   }
 
   handleBackButton = () => {
-    if (this.state.backClickCount === 1) {
-      this.props.loggedIn && this.props.actions.logout();
-      BackHandler.exitApp();
-    } else {
-      this._spring();
+    const scene = Actions.currentScene;
+    // alert(scene)
+    if (scene !== 'login' || scene !== 'home' || scene !== 'homeScreen') {
+      if (this.state.backClickCount === 1) {
+        this.props.loggedIn && this.props.actions.logout();
+        BackHandler.exitApp();
+      } else {
+        this._spring();
+      }
+
+      return true;
     }
 
+    Actions.pop();
     return true;
   };
 
@@ -73,7 +81,7 @@ class ExitDialog extends Component {
             {transform: [{translateY: this.springValue}]},
           ]}>
           <Text style={styles.exitTitleText}>
-            press back again to exit the app
+            Press back again to exit the app
           </Text>
 
           <TouchableOpacity

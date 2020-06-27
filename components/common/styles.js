@@ -1,5 +1,6 @@
 import {StyleSheet, Platform} from 'react-native';
 import * as constants from './constants';
+import * as colors from './colors';
 
 const styles = StyleSheet.create({
   container: {
@@ -130,6 +131,11 @@ const styles = StyleSheet.create({
     color: '#e5933a',
     paddingHorizontal: 10,
     paddingVertical: 3,
+  },
+  settingsScroll: {
+    flex: 1,
+    backgroundColor:
+      Platform.OS === 'ios' ? colors.iosSettingsBackground : colors.white,
   },
 });
 

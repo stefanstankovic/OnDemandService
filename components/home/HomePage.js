@@ -1,74 +1,19 @@
 import React, {Component, useContext} from 'react';
-import {View, Image, Animated, FlatList} from 'react-native';
+import {View, Animated, FlatList, TouchableOpacity} from 'react-native';
 
 import {connect} from 'react-redux';
-import {Header} from 'react-native-elements';
+import {bindActionCreators} from 'redux';
+import {workersActions} from '../../redux/actions/workers.actions';
+
+import {Actions} from 'react-native-router-flux';
+
+import {Header, ListItem, Icon} from 'react-native-elements';
 
 import styles from '../common/styles';
 import * as constants from '../common/constants';
 
-const data = [
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/articles/rkvHXu_Il/rkvHXu_Il-1100-700.jpg',
-    title: 'Le Brûloir',
-  },
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/articles/rkTnGunIx/rkTnGunIx-1100-700.jpg',
-    title: 'Le Petit Brûloir',
-  },
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/articles/HknxZ9awg/HknxZ9awg-1100-700.jpg',
-    title: 'Oui Mais Non',
-  },
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/merchants/rJWPQ2mKx/rJWPQ2mKx-1100-700.jpg',
-    title: 'PERKO',
-  },
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/merchants/rJWPQ2mKx/rJWPQ2mKx-1100-700.jpg',
-    title: 'Perko',
-  },
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/articles/B1XmNBmLe/B1XmNBmLe-1100-700.jpg',
-    title: 'Café Saint-Henri | Marché Jean-Talon',
-  },
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/articles/rkvHXu_Il/rkvHXu_Il-1100-700.jpg',
-    title: 'Le Brûloir',
-  },
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/articles/rkTnGunIx/rkTnGunIx-1100-700.jpg',
-    title: 'Le Petit Brûloir',
-  },
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/articles/HknxZ9awg/HknxZ9awg-1100-700.jpg',
-    title: 'Oui Mais Non',
-  },
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/merchants/rJWPQ2mKx/rJWPQ2mKx-1100-700.jpg',
-    title: 'PERKO',
-  },
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/merchants/rJWPQ2mKx/rJWPQ2mKx-1100-700.jpg',
-    title: 'Perko',
-  },
-  {
-    image:
-      'https://cdn.th3rdwave.coffee/articles/B1XmNBmLe/B1XmNBmLe-1100-700.jpg',
-    title: 'Café Saint-Henri | Marché Jean-Talon',
-  },
-];
+import SocketService from '../../services/socket.service';
+import {WS_BASE} from '../../config';
 
 const AnimatedListView = Animated.createAnimatedComponent(FlatList);
 const AnimatedHeader = Animated.createAnimatedComponent(Header);
@@ -80,8 +25,9 @@ class HomePage extends Component {
     const scrollAnim = new Animated.Value(0);
     const offsetAnim = new Animated.Value(0);
 
+    this.props.actions.allWorkers(this.props.authToken);
+
     this.state = {
-      dataSource: data,
       scrollAnim,
       offsetAnim,
       clampedScroll: Animated.diffClamp(
@@ -115,11 +61,19 @@ class HomePage extends Component {
     this.state.offsetAnim.addListener(({value}) => {
       this._offsetValue = value;
     });
+
+    if (this.props.loggedIn) {
+      SocketService.getInstance().connectSocket(WS_BASE, this.props.authToken);
+    }
   }
 
   componentWillUnmount() {
     this.state.scrollAnim.removeAllListeners();
     this.state.offsetAnim.removeAllListeners();
+
+    if (this.props.loggedIn) {
+      SocketService.getInstance().disconnetFromSocket();
+    }
   }
 
   _onScrollEndDrag = () => {
@@ -145,17 +99,23 @@ class HomePage extends Component {
     }).start();
   };
 
-  _renderRow = (rowData, sectionId, rowId) => {
-    let loadedItem = rowData.leadingItem;
+  _renderRow = ({item}) => {
+    //let loadedItem = rowData.leadingItem;
     return (
-      <Image
-        style={styles.row}
-        key={rowId}
-        source={{uri: loadedItem.image}}
-        resizeMode="cover"
-      />
+      <TouchableOpacity onPress={() => Actions.viewProfile()}>
+        <ListItem
+          title={`${item.name}`}
+          subtitle={item.email}
+          avatar={{
+            uri:
+              'https://icons.iconarchive.com/icons/papirus-team/papirus-status/512/avatar-default-icon.png',
+          }}
+        />
+      </TouchableOpacity>
     );
   };
+
+  _keyExtractor = (item, index) => index.toString();
 
   render() {
     const {clampedScroll} = this.state;
@@ -177,14 +137,14 @@ class HomePage extends Component {
     return (
       <View style={styles.fill}>
         <AnimatedListView
-          data={this.state.dataSource}
-          ItemSeparatorComponent={this._renderRow}
+          data={this.props.workers}
           style={styles.contentContainer}
-          renderRow={this._renderRow}
+          renderItem={this._renderRow}
           scrollEventThrottle={1}
           onMomentumScrollBegin={this._onMomentumScrollBegin}
           onMomentumScrollEnd={this._onMomentumScrollEnd}
           onScrollEndDrag={this._onScrollEndDrag}
+          keyExtractor={this._keyExtractor}
           onScroll={Animated.event(
             [{nativeEvent: {contentOffset: {y: this.state.scrollAnim}}}],
             {useNativeDriver: true},
@@ -195,9 +155,12 @@ class HomePage extends Component {
           <AnimatedHeader
             containerStyle={styles.headerContainer}
             style={[styles.title, {opacity: navbarOpacity}]}
-            leftComponent={{icon: 'menu', color: '#fff'}}
             centerComponent={{text: 'MY TITLE', style: {color: '#fff'}}}
-            rightComponent={{icon: 'home', color: '#fff'}}
+            rightComponent={{
+              icon: 'settings',
+              color: '#fff',
+              onPress: () => Actions.settings(),
+            }}
           />
         </Animated.View>
       </View>
@@ -205,4 +168,24 @@ class HomePage extends Component {
   }
 }
 
-export default connect()(HomePage);
+function mapStateToProps(state) {
+  return {
+    loadingWorkers: state.workers.loadingWorkers,
+    workers: state.workers.workers,
+    authToken: state.user.token,
+    loggedIn: state.user.loggedIn,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: {
+      allWorkers: bindActionCreators(workersActions.allWorkers, dispatch),
+    },
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(HomePage);
