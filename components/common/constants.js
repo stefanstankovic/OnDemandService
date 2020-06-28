@@ -32,3 +32,13 @@ export const SETTINGS_DIALOG_INPUT_TYPES = {
 
 export const ACTIVE_TAB_ICON_COLOR = '#c4e3cb';
 export const TAB_ICON_COLOR = '#f4f9f4';
+
+const headerMaxHeight = SCREEN_HEIGHT * 0.61;
+const headerMinHeight = Platform.OS === 'ios' ? 60 : 73;
+const headerScrollDistance = headerMaxHeight - headerMinHeight;
+
+export const PROFILE = {
+  HEADER_MAX_HEIGHT: headerMaxHeight,
+  HEADER_MIN_HEIGHT: headerMinHeight,
+  HEADER_SCROLL_DISTANCE: headerScrollDistance,
+};

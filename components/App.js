@@ -10,7 +10,7 @@ import HomePage from './home/HomePage';
 import MapPage from './home/MapPage';
 import SettingsPage from './home/SettingsPage';
 import NotificationsPage from './home/NotificationsPage';
-import ProfileViewPage from './home/profile/ProfileViewPage';
+import ProfileViewPage from './home/ProfileViewPage';
 
 import ExitDialog from './common/ExitDialog';
 
