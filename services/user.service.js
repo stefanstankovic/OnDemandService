@@ -1,5 +1,6 @@
 import {authHeader} from '../helpers/auth-helper';
 import {API_BASE} from '../config';
+import {set} from 'lodash';
 
 export const userService = {
   login,
@@ -40,7 +41,7 @@ function getAll() {
     headers: authHeader(),
   };
 
-  return fetch('/user/users', requestOptions).then(handleResponse);
+  return fetch(`${API_BASE}/user/users`, requestOptions).then(handleResponse);
 }
 
 function getById(id) {
@@ -49,7 +50,7 @@ function getById(id) {
     headers: authHeader(),
   };
 
-  return fetch('/users/' + id, requestOptions).then(handleResponse);
+  return fetch(`${API_BASE}/user/` + id, requestOptions).then(handleResponse);
 }
 
 function register(user) {
@@ -70,14 +71,18 @@ function register(user) {
     });
 }
 
-function update(user) {
+function update(user, token) {
+  let headers = authHeader(token);
+  set(headers, 'Content-Type', 'application/json');
   const requestOptions = {
     method: 'PUT',
-    headers: {...authHeader(), 'Content-Type': 'application/json'},
+    headers: headers,
     body: JSON.stringify(user),
   };
 
-  return fetch('/users/' + user.id, requestOptions).then(handleResponse);
+  return fetch(`${API_BASE}/user/` + user.id, requestOptions).then(
+    handleResponse,
+  );
 }
 
 // prefixed function name with underscore because delete is a reserved word in javascript
@@ -87,7 +92,7 @@ function _delete(id) {
     headers: authHeader(),
   };
 
-  return fetch('/users/' + id, requestOptions).then(handleResponse);
+  return fetch(`${API_BASE}/user/` + id, requestOptions).then(handleResponse);
 }
 
 async function handleResponse(response) {
