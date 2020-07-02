@@ -1,5 +1,6 @@
 import {authHeader} from '../helpers/auth-helper';
 import {API_BASE} from '../config';
+import {set} from 'lodash';
 
 export const userDetailsService = {
   getByUserId,
@@ -18,9 +19,11 @@ function getByUserId(userId, token) {
 }
 
 function update(userDetails, token) {
+  let headers = authHeader(token);
+  set(headers, 'Content-Type', 'application/json');
   const requestOptions = {
     method: 'PUT',
-    headers: {...authHeader(token), 'Content-Type': 'application/json'},
+    headers: headers,
     body: JSON.stringify(userDetails),
   };
 

@@ -11,6 +11,7 @@ import MapPage from './home/MapPage';
 import SettingsPage from './home/SettingsPage';
 import NotificationsPage from './home/NotificationsPage';
 import ProfileViewPage from './home/ProfileViewPage';
+import HireRequestPage from './home/HireRequestPage';
 
 import ExitDialog from './common/ExitDialog';
 
@@ -128,6 +129,15 @@ class App extends React.Component {
               path="/home/settings/:id"
               initial={false}
               component={SettingsPage}
+            />
+            <Scene
+              key="hireRequest"
+              title="Hire Request"
+              hideTabBar={true}
+              hideNavBar={true}
+              path="/home/hire/:id"
+              initial={false}
+              component={HireRequestPage}
             />
           </Scene>
         </Router>

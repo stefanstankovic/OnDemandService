@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: 'white',
     alignSelf: 'center',
-    marginTop: 70,
+    marginTop: 120,
   },
   profileName: {
     fontSize: 22,
@@ -91,8 +91,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: 'center',
   },
-  profilButtonContainer: {
-    marginTop: 10,
+  profileButtonContainer: {
+    marginTop: 20,
     height: 45,
     flexDirection: 'row',
     justifyContent: 'center',

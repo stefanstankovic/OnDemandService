@@ -1,6 +1,6 @@
 export default {
   loggedIn: false,
-  updating: false,
+  isLoading: false,
   user: {},
   location: {
     longitude: null,

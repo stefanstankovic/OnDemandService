@@ -4,23 +4,29 @@ import initialState from './initialState';
 export function user(state = initialState, action) {
   switch (action.type) {
     case types.LOGIN_REQUEST:
-      return {...state, logging: true};
+      return {...state, isLoading: true};
     case types.LOGIN_SUCCESS:
-      return {...state, loggedIn: true, user: action.user, token: action.token};
+      return {
+        ...state,
+        loggedIn: true,
+        isLoading: false,
+        user: action.user,
+        token: action.token,
+      };
     case types.LOGIN_FAILURE:
-      return {...state, loggedIn: false};
+      return {...state, isLoading: false, loggedIn: false};
     case types.UPDATE_USER_REQUEST:
-      return {...state, updating: true};
+      return {...state, isLoading: true};
     case types.UPDATE_USER_SUCCESS:
-      return {...state, updating: false, user: action.user};
+      return {...state, isLoading: false, user: action.user};
     case types.UPDATE_USER_FAILURE:
-      return {...state, updating: false};
+      return {...state, isLoading: false};
     case types.LOGOUT:
-      return {...state, loggedIn: false, user: {}, token: ''};
+      return {...state, loggedIn: false, user: {}, token: '', isLoading: false};
     case types.REGISTER_REQUEST:
       return {
         ...state,
-        registering: true,
+        isLoading: false,
       };
     case types.REGISTER_SUCCESS:
       return {
@@ -28,9 +34,10 @@ export function user(state = initialState, action) {
         loggedIn: true,
         user: action.user,
         token: action.token,
+        isLoading: false,
       };
     case types.REGISTER_FAILURE:
-      return {...state};
+      return {...state, isLoading: false};
     default:
       return state;
   }

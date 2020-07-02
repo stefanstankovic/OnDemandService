@@ -59,7 +59,7 @@ export function register(user) {
           dispatch(alertActions.error(response.message));
           return;
         }
-        dispatch(success(response.user));
+        dispatch(success(response));
       },
       error => {
         dispatch(failure(error));
@@ -106,11 +106,11 @@ export function getAll() {
   }
 }
 
-export function updateUser(user) {
+export function updateUser(user, token) {
   return dispatch => {
     dispatch(request());
 
-    userService.update(user).then(
+    userService.update(user, token).then(
       response => {
         if (!response.success) {
           dispatch(response.message);

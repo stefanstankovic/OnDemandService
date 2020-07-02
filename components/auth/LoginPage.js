@@ -205,7 +205,7 @@ class LoginPage extends Component {
                     borderBottomColor: 'rgba(0, 0, 0, 0.38)',
                   }}
                   ref={input => (this.emailInput = input)}
-                  onSubmitEditing={() => this.passwordInput.focus()}
+                  onSubmitEditing={() => this.emailInput.focus()}
                   onChangeText={email => this.setState({email})}
                   errorMessage={
                     isEmailValid ? null : 'Please enter a valid email address'

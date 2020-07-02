@@ -3,7 +3,6 @@ import {
   Animated,
   Platform,
   StatusBar,
-  StyleSheet,
   Text,
   View,
   RefreshControl,
@@ -15,6 +14,7 @@ import * as constants from '../common/constants';
 import styles from '../common/profile.styles';
 
 import {connect} from 'react-redux';
+import {Actions} from 'react-native-router-flux';
 
 class ProfileViewPage extends Component {
   constructor(props) {
@@ -109,18 +109,15 @@ class ProfileViewPage extends Component {
         <Animated.View
           pointerEvents="none"
           style={[styles.header, {transform: [{translateY: headerTranslate}]}]}>
-          <View style={styles.header} />
           <Image
             style={styles.profileAvatar}
             source={{uri: 'https://bootdey.com/img/Content/avatar/avatar6.png'}}
           />
           <View style={styles.profileBody}>
             <View style={styles.profileBodyContent}>
-              <Text style={styles.profileInfo}> test@email.com </Text>
-              <Text style={styles.profileInfo}> 0612223334 </Text>
-              <TouchableOpacity style={styles.profilButtonContainer}>
-                <Text style={styles.profileName}>Book worker</Text>
-              </TouchableOpacity>
+              <Text style={styles.title}>{this.props.worker.name}</Text>
+              <Text style={styles.profileInfo}>{this.props.worker.email}</Text>
+              <Text style={styles.profileInfo}>{this.props.worker.mobile}</Text>
             </View>
           </View>
         </Animated.View>
@@ -131,7 +128,13 @@ class ProfileViewPage extends Component {
               transform: [{scale: titleScale}, {translateY: titleTranslate}],
             },
           ]}>
-          <Text style={styles.title}>John Doe</Text>
+          <TouchableOpacity
+            style={styles.profileButtonContainer}
+            onPress={() => {
+              Actions.hireRequest({worker: this.props.worker});
+            }}>
+            <Text style={styles.profileName}>Hire worker</Text>
+          </TouchableOpacity>
         </Animated.View>
       </View>
     );

@@ -4,6 +4,7 @@ import {alertActions} from './alert.actions';
 
 export const workersActions = {
   allWorkers,
+  hireWorker,
   workerLoggedOut,
   workerLoggedIn,
 };
@@ -39,6 +40,40 @@ function allWorkers(token) {
   }
   function failure(error) {
     return {type: types.ALL_WORKERS_FAILURE, error};
+  }
+}
+
+function hireWorker(workerId, message, token) {
+  return dispatch => {
+    dispatch(request());
+
+    workerService.hireWorker(workerId, message, token).then(
+      response => {
+        if (!response.success) {
+          dispatch(failure(response.message));
+          dispatch(alertActions.error(response.message));
+        }
+
+        dispatch(success(workerId));
+      },
+      error => {
+        dispatch(failure(error));
+        dispatch(alertActions.error(error));
+      },
+    );
+  };
+
+  function request() {
+    return {type: types.HIRE_WORKER_REQUEST};
+  }
+  function success(workerId) {
+    return {
+      type: types.HIRE_WORKER_SUCCESS,
+      workerId,
+    };
+  }
+  function failure(error) {
+    return {type: types.HIRE_WORKER_FAILURE, error};
   }
 }
 

@@ -1,5 +1,11 @@
-import React, {Component, useContext} from 'react';
-import {View, Animated, FlatList, TouchableOpacity} from 'react-native';
+import React, {Component} from 'react';
+import {
+  View,
+  Animated,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -7,7 +13,7 @@ import {workersActions} from '../../redux/actions/workers.actions';
 
 import {Actions} from 'react-native-router-flux';
 
-import {Header, ListItem, Icon} from 'react-native-elements';
+import {Header, ListItem} from 'react-native-elements';
 
 import styles from '../common/styles';
 import * as constants from '../common/constants';
@@ -102,7 +108,7 @@ class HomePage extends Component {
   _renderRow = ({item}) => {
     //let loadedItem = rowData.leadingItem;
     return (
-      <TouchableOpacity onPress={() => Actions.viewProfile()}>
+      <TouchableOpacity onPress={() => Actions.viewProfile({worker: item})}>
         <ListItem
           title={`${item.name}`}
           subtitle={item.email}
@@ -145,6 +151,17 @@ class HomePage extends Component {
           onMomentumScrollEnd={this._onMomentumScrollEnd}
           onScrollEndDrag={this._onScrollEndDrag}
           keyExtractor={this._keyExtractor}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={() => {
+                this.setState({refreshing: true});
+                setTimeout(() => this.setState({refreshing: false}), 1000);
+              }}
+              // Android offset for RefreshControl
+              progressViewOffset={constants.NAVBAR_HEIGHT}
+            />
+          }
           onScroll={Animated.event(
             [{nativeEvent: {contentOffset: {y: this.state.scrollAnim}}}],
             {useNativeDriver: true},
@@ -155,7 +172,7 @@ class HomePage extends Component {
           <AnimatedHeader
             containerStyle={styles.headerContainer}
             style={[styles.title, {opacity: navbarOpacity}]}
-            centerComponent={{text: 'MY TITLE', style: {color: '#fff'}}}
+            centerComponent={{text: 'WORKERS', style: {color: '#fff'}}}
             rightComponent={{
               icon: 'settings',
               color: '#fff',
