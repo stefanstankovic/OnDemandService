@@ -2,15 +2,14 @@ import React, {Component} from 'react';
 import {Text} from 'react-native';
 
 import {connect} from 'react-redux';
-
-class NotificationsPage extends Component {
+class NotificationsDetailsPage extends Component {
   constructor(props) {
     super(props);
   }
 
   render() {
-    return <Text>Notifications</Text>;
+    return <Text>Notifications Details</Text>;
   }
 }
 
-export default connect()(NotificationsPage);
+export default connect()(NotificationsDetailsPage);

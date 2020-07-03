@@ -8,5 +8,7 @@ export function rank(state = {ranks: {}, isLoading: false}, action) {
       return {...state, isLoading: false, ranks: action.ranks};
     case types.RANK_FAILURE:
       return {...state, isLoading: false};
+    default:
+      return state;
   }
 }

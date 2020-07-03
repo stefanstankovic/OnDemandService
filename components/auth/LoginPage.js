@@ -13,8 +13,6 @@ import {Input, Button, Icon, ButtonGroup} from 'react-native-elements';
 
 const BG_IMAGE = require('../images/background.png');
 
-import ExitDialog from '../common/ExitDialog';
-
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as userActions from '../../redux/actions/user.actions';

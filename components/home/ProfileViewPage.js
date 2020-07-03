@@ -111,7 +111,7 @@ class ProfileViewPage extends Component {
           style={[styles.header, {transform: [{translateY: headerTranslate}]}]}>
           <Image
             style={styles.profileAvatar}
-            source={{uri: 'https://bootdey.com/img/Content/avatar/avatar6.png'}}
+            source={require('../images/logo.png')}
           />
           <View style={styles.profileBody}>
             <View style={styles.profileBodyContent}>

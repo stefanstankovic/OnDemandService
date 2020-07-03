@@ -1,23 +1,23 @@
 import * as types from './actionTypes';
-import {rankService} from '../../services/rank.service';
+import {notificationService} from '../../services/notifications.service';
 import {alertActions} from './alert.actions';
 
-export const rankActions = {
-  ranksForWorker,
+export const notificationActions = {
+  allNotifications,
 };
 
-export function ranksForWorker(workerId, token) {
+export function allNotifications(token) {
   return dispatch => {
     dispatch(request());
 
-    rankService.ranksForWorker(workerId, token).then(
+    notificationService.allNotifications(token).then(
       response => {
         if (!response.success) {
           dispatch(response.message);
           dispatch(alertActions.error(response.message));
           return;
         }
-        dispatch(success(response.ranks));
+        dispatch(success(response.notifications));
       },
       error => {
         dispatch(failure(error));
@@ -27,12 +27,12 @@ export function ranksForWorker(workerId, token) {
   };
 
   function request() {
-    return {type: types.RANK_REQUEST};
+    return {type: types.NOTIFICATIONS_REQUEST};
   }
-  function success(ranks) {
-    return {type: types.RANK_SUCCESS, ranks};
+  function success(notifications) {
+    return {type: types.NOTIFICATIONS_SUCCESS, notifications};
   }
   function failure(error) {
-    return {type: types.RANK_FAILURE, error};
+    return {type: types.NOTIFICATIONS_FAILURE, error};
   }
 }

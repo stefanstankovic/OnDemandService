@@ -2,7 +2,7 @@ import {authHeader} from '../helpers/auth-helper';
 import {API_BASE} from '../config';
 //import {set} from 'lodash';
 
-export const workerService = {
+export const rankService = {
   ranksForWorker,
 };
 
@@ -12,7 +12,7 @@ function ranksForWorker(workerId, token) {
     headers: authHeader(token),
   };
 
-  return fetch(`${API_BASE}/worker/${workerId}`, requestOptions).then(
+  return fetch(`${API_BASE}/rank/${workerId}`, requestOptions).then(
     handleResponse,
   );
 }
