@@ -39,3 +39,16 @@ export const PROFILE = {
   HEADER_MIN_HEIGHT: headerMinHeight,
   HEADER_SCROLL_DISTANCE: headerScrollDistance,
 };
+
+export const NOTIFICATION_TYPE = {
+  HIRE_REQUEST: 'hireRequest',
+  HIRE_ACCEPTED: 'hireAccepted',
+  HIRE_REJECTED: 'hireRejected',
+};
+
+export const HIRE_REQUEST_STATUS = {
+  PENDING: 'pending',
+  ACCEPTED: 'accepted',
+  REJECTED: 'declined',
+  CONFIRMD: 'confirmed',
+};

@@ -17,7 +17,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as userActions from '../../redux/actions/user.actions';
 
-import styles from '../common/login.styles';
+import styles from '../common/form.styles';
 
 // Enable LayoutAnimation on Android
 UIManager.setLayoutAnimationEnabledExperimental &&
@@ -151,7 +151,7 @@ class LoginPage extends Component {
               </View>
               <View style={{flexDirection: 'row'}}>
                 <Button
-                  disabled={isLoading}
+                  disabled={this.props.isLoading}
                   type="clear"
                   activeOpacity={0.7}
                   onPress={() => this.selectCategory(0)}
@@ -163,7 +163,7 @@ class LoginPage extends Component {
                   title={'Login'}
                 />
                 <Button
-                  disabled={isLoading}
+                  disabled={this.props.isLoading}
                   type="clear"
                   activeOpacity={0.7}
                   onPress={() => this.selectCategory(1)}
@@ -285,8 +285,8 @@ class LoginPage extends Component {
                   title={isLoginPage ? 'LOGIN' : 'SIGN UP'}
                   onPress={isLoginPage ? this.login : this.signUp}
                   titleStyle={styles.loginTextButton}
-                  loading={isLoading}
-                  disabled={isLoading}
+                  loading={this.props.isLoading}
+                  disabled={this.props.isLoading}
                 />
               </View>
             </ScrollView>
@@ -306,6 +306,7 @@ LoginPage.propTypes = {
 function mapStateToProps(state) {
   return {
     loggedIn: state.user.loggedIn,
+    isLoading: state.user.isLoading,
     user: state.user.user,
   };
 }

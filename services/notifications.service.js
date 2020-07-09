@@ -4,6 +4,7 @@ import {API_BASE} from '../config';
 export const notificationService = {
   allNotifications,
   updateNotification,
+  getNotification,
 };
 
 function allNotifications(token) {
@@ -25,6 +26,17 @@ function updateNotification(notificationId, token) {
     `${API_BASE}/notification/${notificationId}`,
     requestOptions,
   ).then(handleResponse);
+}
+
+function getNotification(id, token) {
+  const requestOptions = {
+    method: 'GET',
+    headers: authHeader(token),
+  };
+
+  return fetch(`${API_BASE}/notification/${id}`, requestOptions).then(
+    handleResponse,
+  );
 }
 
 async function handleResponse(response) {

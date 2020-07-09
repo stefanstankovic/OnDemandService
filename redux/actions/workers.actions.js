@@ -7,6 +7,8 @@ export const workersActions = {
   hireWorker,
   workerLoggedOut,
   workerLoggedIn,
+  hireResponse,
+  confirmJob,
 };
 
 function allWorkers(token) {
@@ -74,6 +76,72 @@ function hireWorker(workerId, message, token) {
   }
   function failure(error) {
     return {type: types.HIRE_WORKER_FAILURE, error};
+  }
+}
+
+function hireResponse(hireRequestId, accepted, message, token) {
+  return dispatch => {
+    dispatch(request());
+
+    workerService.hireResponse(hireRequestId, accepted, message, token).then(
+      response => {
+        if (!response.success) {
+          dispatch(failure(response.message));
+          dispatch(alertActions.error(response.message));
+        }
+
+        dispatch(success());
+      },
+      error => {
+        dispatch(failure(error));
+        dispatch(alertActions.error(error));
+      },
+    );
+  };
+
+  function request() {
+    return {type: types.WORKER_RESPONSE_REQUEST};
+  }
+  function success() {
+    return {
+      type: types.WORKER_RESPONSE_SUCCESS,
+    };
+  }
+  function failure(error) {
+    return {type: types.WORKER_RESPONSE_FAILURE, error};
+  }
+}
+
+function confirmJob(hireRequestId, workerId, token) {
+  return dispatch => {
+    dispatch(request());
+
+    workerService.confirmJob(hireRequestId, workerId, token).then(
+      response => {
+        if (!response.success) {
+          dispatch(failure(response.message));
+          dispatch(alertActions.error(response.message));
+        }
+
+        dispatch(success());
+      },
+      error => {
+        dispatch(failure(error));
+        dispatch(alertActions.error(error));
+      },
+    );
+  };
+
+  function request() {
+    return {type: types.CONFIRM_JOB_REQUEST};
+  }
+  function success() {
+    return {
+      type: types.CONFIRM_JOB_SUCCESS,
+    };
+  }
+  function failure(error) {
+    return {type: types.CONFIRM_JOB_FAILURE, error};
   }
 }
 

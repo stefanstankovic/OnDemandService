@@ -12,7 +12,7 @@ import {bindActionCreators} from 'redux';
 
 import {workersActions} from '../../redux/actions/workers.actions';
 
-import styles from '../common/login.styles';
+import styles from '../common/form.styles';
 import {isUndefined} from 'lodash';
 import {Actions} from 'react-native-router-flux';
 
@@ -23,7 +23,6 @@ class HireRequestPage extends Component {
       when: '',
       where: '',
       comment: '',
-      isLoading: false,
       isWhenValid: true,
       isWhereValid: true,
       isCommentValid: true,
@@ -70,7 +69,7 @@ class HireRequestPage extends Component {
     );
 
     if (
-      !this.props.loading &&
+      !this.props.isLoading &&
       isUndefined(this.props.hiredWorkerId) &&
       !isUndefined(this.props.error)
     ) {

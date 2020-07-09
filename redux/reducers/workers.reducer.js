@@ -27,6 +27,26 @@ export function workers(
       };
     case types.HIRE_WORKER_SUCCESS:
       return {...state, isLoading: false, workerId: action.workerId};
+    case types.WORKER_RESPONSE_REQUEST:
+      return {...state, isLoading: true, error: undefined};
+    case types.WORKER_RESPONSE_FAILURE:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.error,
+      };
+    case types.CONFIRM_JOB_SUCCESS:
+      return {...state, isLoading: false};
+    case types.CONFIRM_JOB_REQUEST:
+      return {...state, isLoading: true, error: undefined};
+    case types.CONFIRM_JOB_FAILURE:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.error,
+      };
+    case types.WORKER_RESPONSE_SUCCESS:
+      return {...state, isLoading: false};
     default:
       return {...state};
   }

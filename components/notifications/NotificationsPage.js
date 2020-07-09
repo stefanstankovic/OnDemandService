@@ -27,17 +27,22 @@ class NotificationsPage extends Component {
 
   getNotificationTitle = type => {
     switch (type) {
-      case 'hireRequest':
+      case constants.NOTIFICATION_TYPE.HIRE_REQUEST:
         return 'Work Request';
+      case constants.NOTIFICATION_TYPE.HIRE_ACCEPTED:
+        return 'Job Accepted';
+      case constants.NOTIFICATION_TYPE.HIRE_REJECTED:
+        return 'Job Rejected';
       default:
         return 'Notification';
     }
   };
 
   getNotificationSubtitle = (type, messageData) => {
+    let messageObject = {};
     switch (type) {
-      case 'hireRequest':
-        let messageObject = JSON.parse(messageData);
+      case constants.NOTIFICATION_TYPE.HIRE_REQUEST:
+        messageObject = JSON.parse(messageData);
         let splittedMessage = messageObject.message.split('|');
         let newMessage =
           `When: ${splittedMessage[0]}, ` +
@@ -45,6 +50,10 @@ class NotificationsPage extends Component {
           `Comment: ${splittedMessage[2]}`;
 
         return newMessage.substr(0, 30) + '...';
+      case constants.NOTIFICATION_TYPE.HIRE_REJECTED:
+      case constants.NOTIFICATION_TYPE.HIRE_ACCEPTED:
+        messageObject = JSON.parse(messageData);
+        return messageObject.message.substr(0, 30) + '...';
       default:
         return 'Notification';
     }
@@ -52,7 +61,7 @@ class NotificationsPage extends Component {
 
   renderItem = ({item}) => (
     <TouchableOpacity
-      onPress={() => Actions.notificationDetails({notification: item})}>
+      onPress={() => Actions.notificationDetails({notificationData: item})}>
       <ListItem
         title={this.getNotificationTitle(item.type)}
         subtitle={this.getNotificationSubtitle(item.type, item.messageData)}
