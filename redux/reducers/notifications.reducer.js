@@ -19,7 +19,6 @@ export function notification(
     case types.NOTIFICATION_DETAILS_REQUEST:
       return {...state, isLoading: true};
     case types.NOTIFICATION_DETAILS_SUCCESS:
-      console.log(JSON.stringify(action));
       return {
         ...state,
         isLoading: false,

@@ -33,6 +33,8 @@ class NotificationsPage extends Component {
         return 'Job Accepted';
       case constants.NOTIFICATION_TYPE.HIRE_REJECTED:
         return 'Job Rejected';
+      case constants.NOTIFICATION_TYPE.JOB_CONFIRMED:
+        return 'Job is finished!';
       default:
         return 'Notification';
     }
@@ -54,6 +56,8 @@ class NotificationsPage extends Component {
       case constants.NOTIFICATION_TYPE.HIRE_ACCEPTED:
         messageObject = JSON.parse(messageData);
         return messageObject.message.substr(0, 30) + '...';
+      case constants.NOTIFICATION_TYPE.JOB_CONFIRMED:
+        return 'Please add your rank.';
       default:
         return 'Notification';
     }

@@ -33,6 +33,7 @@ class HomePage extends Component {
     const offsetAnim = new Animated.Value(0);
 
     this.props.actions.allWorkers(this.props.authToken);
+    SocketService.getInstance().connectSocket(WS_BASE, this.props.authToken);
 
     this.state = {
       scrollAnim,
@@ -68,19 +69,11 @@ class HomePage extends Component {
     this.state.offsetAnim.addListener(({value}) => {
       this._offsetValue = value;
     });
-
-    if (this.props.loggedIn) {
-      SocketService.getInstance().connectSocket(WS_BASE, this.props.authToken);
-    }
   }
 
   componentWillUnmount() {
     this.state.scrollAnim.removeAllListeners();
     this.state.offsetAnim.removeAllListeners();
-
-    if (this.props.loggedIn) {
-      SocketService.getInstance().disconnetFromSocket();
-    }
   }
 
   _onScrollEndDrag = () => {

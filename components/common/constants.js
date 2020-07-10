@@ -44,11 +44,12 @@ export const NOTIFICATION_TYPE = {
   HIRE_REQUEST: 'hireRequest',
   HIRE_ACCEPTED: 'hireAccepted',
   HIRE_REJECTED: 'hireRejected',
+  JOB_CONFIRMED: 'jobConfirmed',
 };
 
 export const HIRE_REQUEST_STATUS = {
   PENDING: 'pending',
   ACCEPTED: 'accepted',
   REJECTED: 'declined',
-  CONFIRMD: 'confirmed',
+  CONFIRMS: 'confirmed',
 };
