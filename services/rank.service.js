@@ -1,9 +1,10 @@
 import {authHeader} from '../helpers/auth-helper';
 import {API_BASE} from '../config';
-//import {set} from 'lodash';
+import {set} from 'lodash';
 
-export const workerService = {
+export const rankService = {
   ranksForWorker,
+  addRank,
 };
 
 function ranksForWorker(workerId, token) {
@@ -12,9 +13,26 @@ function ranksForWorker(workerId, token) {
     headers: authHeader(token),
   };
 
-  return fetch(`${API_BASE}/worker/${workerId}`, requestOptions).then(
+  return fetch(`${API_BASE}/rank/${workerId}`, requestOptions).then(
     handleResponse,
   );
+}
+
+function addRank(userId, stars, comment, notificationId, token) {
+  let headers = authHeader(token);
+  set(headers, 'Content-Type', 'application/json');
+  const requestOptions = {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({
+      userId: userId,
+      stars: stars,
+      comment: comment,
+      notificationId: notificationId,
+    }),
+  };
+
+  return fetch(`${API_BASE}/rank/`, requestOptions).then(handleResponse);
 }
 
 async function handleResponse(response) {

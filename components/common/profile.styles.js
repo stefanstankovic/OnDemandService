@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   row: {
     height: 40,
     margin: 16,
-    backgroundColor: colors.profileRawBackground,
+    //backgroundColor: colors.profileRawBackground,
     alignItems: 'center',
     justifyContent: 'center',
   },

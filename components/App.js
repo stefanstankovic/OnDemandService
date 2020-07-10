@@ -1,24 +1,27 @@
 import React from 'react';
-import {Router, Scene, Drawer} from 'react-native-router-flux';
+import {Router, Scene} from 'react-native-router-flux';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
 import {Icon} from 'react-native-elements';
 
 import LoginPage from './auth/LoginPage';
+
 import HomePage from './home/HomePage';
 import MapPage from './home/MapPage';
 import SettingsPage from './home/SettingsPage';
-import NotificationsPage from './home/NotificationsPage';
 import ProfileViewPage from './home/ProfileViewPage';
 import HireRequestPage from './home/HireRequestPage';
+
+import NotificationsPage from './notifications/NotificationsPage';
+import NotificationDetailsPage from './notifications/NotificationDetailsPage';
 
 import ExitDialog from './common/ExitDialog';
 
 import {alertActions} from '../redux/actions/alert.actions';
 
 import styles from './common/styles';
-import * as constants from './common/constants';
+import colors from './common/colors';
 
 class App extends React.Component {
   constructor(props) {
@@ -60,11 +63,7 @@ class App extends React.Component {
                       type="antdesign"
                       name={'home'}
                       size={30}
-                      color={
-                        focused
-                          ? constants.ACTIVE_TAB_ICON_COLOR
-                          : constants.TAB_ICON_COLOR
-                      }
+                      color={focused ? colors.activeTab : colors.tabIcon}
                     />
                   );
                 }}
@@ -81,11 +80,7 @@ class App extends React.Component {
                       type="entypo"
                       name={'map'}
                       size={30}
-                      color={
-                        focused
-                          ? constants.ACTIVE_TAB_ICON_COLOR
-                          : constants.TAB_ICON_COLOR
-                      }
+                      color={focused ? colors.activeTab : colors.tabIcon}
                     />
                   );
                 }}
@@ -102,11 +97,7 @@ class App extends React.Component {
                       type="antdesign"
                       name={'notification'}
                       size={30}
-                      color={
-                        focused
-                          ? constants.ACTIVE_TAB_ICON_COLOR
-                          : constants.TAB_ICON_COLOR
-                      }
+                      color={focused ? colors.activeTab : colors.tabIcon}
                     />
                   );
                 }}
@@ -138,6 +129,13 @@ class App extends React.Component {
               path="/home/hire/:id"
               initial={false}
               component={HireRequestPage}
+            />
+            <Scene
+              key="notificationDetails"
+              title="Notification Details"
+              path="/notification/:id"
+              initial={false}
+              component={NotificationDetailsPage}
             />
           </Scene>
         </Router>

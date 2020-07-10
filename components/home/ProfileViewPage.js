@@ -8,12 +8,19 @@ import {
   RefreshControl,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 
 import * as constants from '../common/constants';
+
 import styles from '../common/profile.styles';
+import defaultStyles from '../common/styles';
+import formStyles from '../common/form.styles';
 
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {rankActions} from '../../redux/actions/rank.actions';
+
 import {Actions} from 'react-native-router-flux';
 
 class ProfileViewPage extends Component {
@@ -27,17 +34,60 @@ class ProfileViewPage extends Component {
       ),
       refreshing: false,
     };
+
+    this.props.actions.ranksForWorker(
+      this.props.worker.id,
+      this.props.authToken,
+    );
   }
 
   _renderScrollViewContent() {
-    const data = Array.from({length: 30});
+    if (!this.props.isLoading && this.props.ranks.length === 0) {
+      return (
+        <View style={styles.scrollViewContent}>
+          <View style={formStyles.container}>
+            <Text>This customer hasn't had ranks yet!</Text>
+          </View>
+        </View>
+      );
+    }
+
     return (
       <View style={styles.scrollViewContent}>
-        {data.map((_, i) => (
-          <View key={i} style={styles.row}>
-            <Text>{i}</Text>
-          </View>
-        ))}
+        {this.props.ranks.map((value, i) => {
+          const star1icon =
+            value.stars >= 1
+              ? require('../images/full-star.png')
+              : require('../images/empty-star.png');
+          const star2icon =
+            value.stars >= 2
+              ? require('../images/full-star.png')
+              : require('../images/empty-star.png');
+          const star3icon =
+            value.stars >= 3
+              ? require('../images/full-star.png')
+              : require('../images/empty-star.png');
+          const star4icon =
+            value.stars >= 4
+              ? require('../images/full-star.png')
+              : require('../images/empty-star.png');
+          const star5icon =
+            value.stars === 5
+              ? require('../images/full-star.png')
+              : require('../images/empty-star.png');
+          return (
+            <View key={i} style={formStyles.container}>
+              <View style={formStyles.starContainer}>
+                <Image style={formStyles.star} source={star1icon} />
+                <Image style={formStyles.star} source={star2icon} />
+                <Image style={formStyles.star} source={star3icon} />
+                <Image style={formStyles.star} source={star4icon} />
+                <Image style={formStyles.star} source={star5icon} />
+              </View>
+              <Text style={formStyles.additionalInfo}>{value.comment}</Text>
+            </View>
+          );
+        })}
       </View>
     );
   }
@@ -104,6 +154,11 @@ class ProfileViewPage extends Component {
           contentOffset={{
             y: -constants.PROFILE.HEADER_MAX_HEIGHT,
           }}>
+          {this.props.isLoading && (
+            <View style={defaultStyles.loading}>
+              <ActivityIndicator size="large" />
+            </View>
+          )}
           {this._renderScrollViewContent()}
         </Animated.ScrollView>
         <Animated.View
@@ -111,7 +166,7 @@ class ProfileViewPage extends Component {
           style={[styles.header, {transform: [{translateY: headerTranslate}]}]}>
           <Image
             style={styles.profileAvatar}
-            source={{uri: 'https://bootdey.com/img/Content/avatar/avatar6.png'}}
+            source={require('../images/logo.png')}
           />
           <View style={styles.profileBody}>
             <View style={styles.profileBodyContent}>
@@ -141,4 +196,23 @@ class ProfileViewPage extends Component {
   }
 }
 
-export default connect()(ProfileViewPage);
+function mapStateToProps(state) {
+  return {
+    isLoading: state.rank.isLoading,
+    authToken: state.user.token,
+    ranks: state.rank.ranks,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: {
+      ranksForWorker: bindActionCreators(rankActions.ranksForWorker, dispatch),
+    },
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ProfileViewPage);

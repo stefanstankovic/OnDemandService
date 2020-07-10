@@ -13,13 +13,14 @@ import {workersActions} from '../../redux/actions/workers.actions';
 
 import {Actions} from 'react-native-router-flux';
 
-import {Header, ListItem} from 'react-native-elements';
+import {Header, ListItem, Avatar} from 'react-native-elements';
 
 import styles from '../common/styles';
 import * as constants from '../common/constants';
 
 import SocketService from '../../services/socket.service';
 import {WS_BASE} from '../../config';
+import colors from '../common/colors';
 
 const AnimatedListView = Animated.createAnimatedComponent(FlatList);
 const AnimatedHeader = Animated.createAnimatedComponent(Header);
@@ -32,6 +33,7 @@ class HomePage extends Component {
     const offsetAnim = new Animated.Value(0);
 
     this.props.actions.allWorkers(this.props.authToken);
+    SocketService.getInstance().connectSocket(WS_BASE, this.props.authToken);
 
     this.state = {
       scrollAnim,
@@ -67,19 +69,11 @@ class HomePage extends Component {
     this.state.offsetAnim.addListener(({value}) => {
       this._offsetValue = value;
     });
-
-    if (this.props.loggedIn) {
-      SocketService.getInstance().connectSocket(WS_BASE, this.props.authToken);
-    }
   }
 
   componentWillUnmount() {
     this.state.scrollAnim.removeAllListeners();
     this.state.offsetAnim.removeAllListeners();
-
-    if (this.props.loggedIn) {
-      SocketService.getInstance().disconnetFromSocket();
-    }
   }
 
   _onScrollEndDrag = () => {
@@ -106,16 +100,23 @@ class HomePage extends Component {
   };
 
   _renderRow = ({item}) => {
-    //let loadedItem = rowData.leadingItem;
     return (
       <TouchableOpacity onPress={() => Actions.viewProfile({worker: item})}>
         <ListItem
+          badge={{
+            textStyle: {color: 'green'},
+          }}
           title={`${item.name}`}
           subtitle={item.email}
-          avatar={{
-            uri:
-              'https://icons.iconarchive.com/icons/papirus-team/papirus-status/512/avatar-default-icon.png',
-          }}
+          leftAvatar={
+            <Avatar
+              rounded
+              source={require('../images/logo.png')}
+              title={'Sample Title'}
+            />
+          }
+          bottomDivider
+          chevron
         />
       </TouchableOpacity>
     );
@@ -156,7 +157,8 @@ class HomePage extends Component {
               refreshing={this.state.refreshing}
               onRefresh={() => {
                 this.setState({refreshing: true});
-                setTimeout(() => this.setState({refreshing: false}), 1000);
+                this.props.actions.allWorkers(this.props.authToken);
+                this.setState({refreshing: false});
               }}
               // Android offset for RefreshControl
               progressViewOffset={constants.NAVBAR_HEIGHT}
@@ -172,10 +174,10 @@ class HomePage extends Component {
           <AnimatedHeader
             containerStyle={styles.headerContainer}
             style={[styles.title, {opacity: navbarOpacity}]}
-            centerComponent={{text: 'WORKERS', style: {color: '#fff'}}}
+            centerComponent={{text: 'WORKERS', style: {color: colors.white}}}
             rightComponent={{
               icon: 'settings',
-              color: '#fff',
+              color: colors.white,
               onPress: () => Actions.settings(),
             }}
           />

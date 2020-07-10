@@ -44,7 +44,7 @@ export function login(email, password) {
 }
 
 export function logout() {
-  //userService.logout();
+  userService.logout();
   return {type: types.LOGOUT};
 }
 

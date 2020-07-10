@@ -98,6 +98,32 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(0, 0, 0, 0.38)',
   },
   groupButton: {height: 35},
+  additionalInfo: {
+    marginTop: 10,
+    color: '#696969',
+  },
+  name: {
+    alignItems: 'center',
+    fontSize: 28,
+    color: '#696969',
+    fontWeight: 'bold',
+  },
+  description: {
+    marginLeft: 10,
+    marginTop: 10,
+    fontSize: 18,
+    color: '#696969',
+  },
+  star: {
+    width: 40,
+    height: 40,
+  },
+  starContainer: {
+    justifyContent: 'center',
+    marginHorizontal: 30,
+    flexDirection: 'row',
+    marginTop: 20,
+  },
 });
 
 export default styles;

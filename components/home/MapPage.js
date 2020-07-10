@@ -59,7 +59,6 @@ class MapPage extends Component {
     this.watchID = Geolocation.watchPosition(
       ({coords}) => {
         const {latitude, longitude} = coords;
-        console.log('Location changed');
         let polyline = [...this.state.polyline];
         polyline.push({
           latitude: latitude,

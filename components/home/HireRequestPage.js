@@ -1,5 +1,10 @@
 import React, {Component} from 'react';
-import {View, KeyboardAvoidingView, ScrollView} from 'react-native';
+import {
+  View,
+  KeyboardAvoidingView,
+  ScrollView,
+  ImageBackground,
+} from 'react-native';
 import {Input, Icon, Button} from 'react-native-elements';
 
 import {connect} from 'react-redux';
@@ -7,7 +12,7 @@ import {bindActionCreators} from 'redux';
 
 import {workersActions} from '../../redux/actions/workers.actions';
 
-import styles from '../common/login.styles';
+import styles from '../common/form.styles';
 import {isUndefined} from 'lodash';
 import {Actions} from 'react-native-router-flux';
 
@@ -18,7 +23,6 @@ class HireRequestPage extends Component {
       when: '',
       where: '',
       comment: '',
-      isLoading: false,
       isWhenValid: true,
       isWhereValid: true,
       isCommentValid: true,
@@ -65,7 +69,7 @@ class HireRequestPage extends Component {
     );
 
     if (
-      !this.props.loading &&
+      !this.props.isLoading &&
       isUndefined(this.props.hiredWorkerId) &&
       !isUndefined(this.props.error)
     ) {
@@ -76,106 +80,110 @@ class HireRequestPage extends Component {
   render() {
     return (
       <KeyboardAvoidingView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.loginContainer}>
-          <View style={styles.formContainer}>
-            <Input
-              leftIcon={
-                <Icon
-                  name="envelope-o"
-                  type="font-awesome"
-                  color="rgba(0, 0, 0, 0.38)"
-                  size={25}
-                  style={styles.transparent}
-                />
-              }
-              value={this.state.when}
-              keyboardAppearance="light"
-              autoFocus={false}
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="next"
-              inputStyle={{marginLeft: 10}}
-              placeholder={'When'}
-              containerStyle={{
-                borderBottomColor: 'rgba(0, 0, 0, 0.38)',
-              }}
-              ref={input => (this.whenInput = input)}
-              onSubmitEditing={() => this.whenInput.focus()}
-              onChangeText={when => this.setState({when})}
-              errorMessage={
-                this.state.isWhenValid ? null : "The field can't be empty"
-              }
+        <ImageBackground
+          source={require('../images/background.png')}
+          style={styles.bgImage}>
+          <ScrollView contentContainerStyle={styles.loginContainer}>
+            <View style={styles.formContainer}>
+              <Input
+                leftIcon={
+                  <Icon
+                    name="clock-o"
+                    type="font-awesome"
+                    color="rgba(0, 0, 0, 0.38)"
+                    size={25}
+                    style={styles.transparent}
+                  />
+                }
+                value={this.state.when}
+                keyboardAppearance="light"
+                autoFocus={false}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                inputStyle={{marginLeft: 10}}
+                placeholder={'When'}
+                containerStyle={{
+                  borderBottomColor: 'rgba(0, 0, 0, 0.38)',
+                }}
+                ref={input => (this.whenInput = input)}
+                onSubmitEditing={() => this.whenInput.focus()}
+                onChangeText={when => this.setState({when})}
+                errorMessage={
+                  this.state.isWhenValid ? null : "The field can't be empty"
+                }
+              />
+              <Input
+                leftIcon={
+                  <Icon
+                    name="map-marker"
+                    type="font-awesome"
+                    color="rgba(0, 0, 0, 0.38)"
+                    size={25}
+                    style={styles.transparent}
+                  />
+                }
+                value={this.state.where}
+                keyboardAppearance="light"
+                autoFocus={false}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                inputStyle={{marginLeft: 10}}
+                placeholder={'Where'}
+                containerStyle={{
+                  borderBottomColor: 'rgba(0, 0, 0, 0.38)',
+                }}
+                ref={input => (this.whereInput = input)}
+                onSubmitEditing={() => this.whereInput.focus()}
+                onChangeText={where => this.setState({where})}
+                errorMessage={
+                  this.state.isWhereValid ? null : "The field can't be empty"
+                }
+              />
+              <Input
+                leftIcon={
+                  <Icon
+                    name="edit"
+                    type="font-awesome"
+                    color="rgba(0, 0, 0, 0.38)"
+                    size={25}
+                    style={styles.transparent}
+                  />
+                }
+                value={this.state.comment}
+                keyboardAppearance="light"
+                autoFocus={false}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="done"
+                inputStyle={{marginLeft: 10}}
+                placeholder={'Comment'}
+                containerStyle={{
+                  borderBottomColor: 'rgba(0, 0, 0, 0.38)',
+                }}
+                ref={input => (this.commentInput = input)}
+                onSubmitEditing={() => this.commentInput.focus()}
+                onChangeText={comment => this.setState({comment})}
+                errorMessage={
+                  this.state.isCommentValid ? null : "The field can't be empty"
+                }
+                multiline={true}
+                numberOfLines={5}
+              />
+            </View>
+            <Button
+              buttonStyle={styles.loginButton}
+              containerStyle={{marginTop: 32, flex: 0}}
+              activeOpacity={0.8}
+              title={'HIRE'}
+              onPress={this._submit}
+              titleStyle={styles.loginTextButton}
+              loading={this.props.isLoading}
+              disabled={this.props.isLoading}
             />
-            <Input
-              leftIcon={
-                <Icon
-                  name="envelope-o"
-                  type="font-awesome"
-                  color="rgba(0, 0, 0, 0.38)"
-                  size={25}
-                  style={styles.transparent}
-                />
-              }
-              value={this.state.where}
-              keyboardAppearance="light"
-              autoFocus={false}
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="next"
-              inputStyle={{marginLeft: 10}}
-              placeholder={'Where'}
-              containerStyle={{
-                borderBottomColor: 'rgba(0, 0, 0, 0.38)',
-              }}
-              ref={input => (this.whereInput = input)}
-              onSubmitEditing={() => this.whereInput.focus()}
-              onChangeText={where => this.setState({where})}
-              errorMessage={
-                this.state.isWhereValid ? null : "The field can't be empty"
-              }
-            />
-            <Input
-              leftIcon={
-                <Icon
-                  name="envelope-o"
-                  type="font-awesome"
-                  color="rgba(0, 0, 0, 0.38)"
-                  size={25}
-                  style={styles.transparent}
-                />
-              }
-              value={this.state.comment}
-              keyboardAppearance="light"
-              autoFocus={false}
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="done"
-              inputStyle={{marginLeft: 10}}
-              placeholder={'Comment'}
-              containerStyle={{
-                borderBottomColor: 'rgba(0, 0, 0, 0.38)',
-              }}
-              ref={input => (this.commentInput = input)}
-              onSubmitEditing={() => this.commentInput.focus()}
-              onChangeText={comment => this.setState({comment})}
-              errorMessage={
-                this.state.isCommentValid ? null : "The field can't be empty"
-              }
-              multiline={true}
-              numberOfLines={5}
-            />
-          </View>
-          <Button
-            buttonStyle={styles.loginButton}
-            containerStyle={{marginTop: 32, flex: 0}}
-            activeOpacity={0.8}
-            title={'HIRE'}
-            onPress={this._submit}
-            titleStyle={styles.loginTextButton}
-            loading={this.props.isLoading}
-            disabled={this.props.isLoading}
-          />
-        </ScrollView>
+          </ScrollView>
+        </ImageBackground>
       </KeyboardAvoidingView>
     );
   }

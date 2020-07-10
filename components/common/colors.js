@@ -13,5 +13,9 @@ const colors = {
   profileInfo: '#D3D3D3',
   profileDescription: '#696969',
   profileButton: '#00BFFF',
+  linearGradient1: '#00BFFF',
+  linearGradient2: '#D3D3D3',
+  separatorColor: '#696969',
 };
+
 export default colors;
