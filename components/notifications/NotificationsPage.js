@@ -70,7 +70,7 @@ class NotificationsPage extends Component {
         title={this.getNotificationTitle(item.type)}
         subtitle={this.getNotificationSubtitle(item.type, item.messageData)}
         badge={{
-          value: item.delivered ? '' : 'Unread',
+          value: item.opened ? '' : 'Unread',
           textStyle: {color: 'white'},
         }}
         bottomDivider

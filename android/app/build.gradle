@@ -222,8 +222,7 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-
-    implementation project(':react-native-notifications')
+    
     implementation 'com.google.firebase:firebase-analytics:17.2.2'
 
     def multidex_version = "2.0.1"

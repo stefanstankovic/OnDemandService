@@ -10,6 +10,8 @@ import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
 import styles from '../common/styles';
 import * as constants from '../common/constants';
 
+import PushNotification from 'react-native-push-notification';
+
 class MapPage extends Component {
   constructor(props) {
     super(props);

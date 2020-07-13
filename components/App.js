@@ -23,9 +23,27 @@ import {alertActions} from '../redux/actions/alert.actions';
 import styles from './common/styles';
 import colors from './common/colors';
 
+import PushNotification from 'react-native-push-notification';
+
 class App extends React.Component {
   constructor(props) {
     super(props);
+    PushNotification.configure({
+      onRegister: function(token) {
+        console.log('TOKEN:', token);
+      },
+      onNotification: function(notification) {
+        console.log('NOTIFICATION:', notification);
+        //notification.finish(PushNotificationIOS.FetchResult.NoData);
+      },
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+      popInitialNotification: true,
+      requestPermissions: true,
+    });
   }
 
   render() {

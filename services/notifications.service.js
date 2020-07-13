@@ -1,10 +1,12 @@
 import {authHeader} from '../helpers/auth-helper';
 import {API_BASE} from '../config';
+import {set} from 'lodash';
 
 export const notificationService = {
   allNotifications,
   updateNotification,
   getNotification,
+  ackNotification,
 };
 
 function allNotifications(token) {
@@ -13,13 +15,42 @@ function allNotifications(token) {
     headers: authHeader(token),
   };
 
-  return fetch(`${API_BASE}/notification`, requestOptions).then(handleResponse);
+  return fetch(`${API_BASE}/notification`, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      if (!response.success) {
+        return Promise.reject(response.message);
+      }
+      response.notifications.forEach(notification => {
+        const {id, delivered} = notification;
+
+        if (!delivered) {
+          ackNotification(id, token);
+        }
+      });
+
+      return response;
+    });
 }
 
 function updateNotification(notificationId, token) {
   const requestOptions = {
     method: 'GET',
     headers: authHeader(token),
+  };
+
+  return fetch(
+    `${API_BASE}/notification/${notificationId}`,
+    requestOptions,
+  ).then(handleResponse);
+}
+
+function ackNotification(notificationId, token) {
+  let headers = authHeader(token);
+  set(headers, 'Content-Type', 'application/json');
+  const requestOptions = {
+    method: 'PUT',
+    headers: headers,
   };
 
   return fetch(

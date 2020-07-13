@@ -1,11 +1,14 @@
 import * as types from './actionTypes';
 import {notificationService} from '../../services/notifications.service';
+import SocketService from '../../services/socket.service';
 import {alertActions} from './alert.actions';
 
 export const notificationActions = {
   allNotifications,
   getNotification,
   notificationDetailsClosed,
+  subscribeOnNotifications,
+  confirmNotificationDelivered,
 };
 
 export function allNotifications(token) {
@@ -76,4 +79,45 @@ export function getNotification(id, token) {
 
 export function notificationDetailsClosed() {
   return {type: types.NOTIFICATION_DETAILS_CLOSED};
+}
+
+export function subscribeOnNotifications() {
+  return dispatch => {
+    SocketService.getInstance()
+      .getSocket()
+      .on('socket.notify.user', (...args) => {
+        dispatch({type: types.NEW_NOTIFICATION, notification: args[0]});
+      });
+  };
+}
+
+export function confirmNotificationDelivered(notificationId, token) {
+  return dispatch => {
+    dispatch(request());
+
+    notificationService.ackNotification(notificationId, token).then(
+      response => {
+        if (!response.success) {
+          dispatch(response.message);
+          dispatch(alertActions.error(response.message));
+          return;
+        }
+        dispatch(success());
+      },
+      error => {
+        dispatch(failure(error));
+        dispatch(alertActions.error(error));
+      },
+    );
+  };
+
+  function request() {
+    return {type: types.NOTIFICATION_DELIVERED_REQUEST};
+  }
+  function success() {
+    return {type: types.NOTIFICATION_DELIVERED_SUCCESS};
+  }
+  function failure(error) {
+    return {type: types.NOTIFICATION_DELIVERED_FAILURE, error};
+  }
 }

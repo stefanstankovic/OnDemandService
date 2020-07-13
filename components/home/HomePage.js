@@ -10,6 +10,7 @@ import {
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {workersActions} from '../../redux/actions/workers.actions';
+import {notificationActions} from '../../redux/actions/notifications.actions';
 
 import {Actions} from 'react-native-router-flux';
 
@@ -22,6 +23,8 @@ import SocketService from '../../services/socket.service';
 import {WS_BASE} from '../../config';
 import colors from '../common/colors';
 
+import PushNotification from 'react-native-push-notification';
+
 const AnimatedListView = Animated.createAnimatedComponent(FlatList);
 const AnimatedHeader = Animated.createAnimatedComponent(Header);
 
@@ -33,7 +36,7 @@ class HomePage extends Component {
     const offsetAnim = new Animated.Value(0);
 
     this.props.actions.allWorkers(this.props.authToken);
-    SocketService.getInstance().connectSocket(WS_BASE, this.props.authToken);
+    this.subscribe();
 
     this.state = {
       scrollAnim,
@@ -51,6 +54,11 @@ class HomePage extends Component {
         constants.NAVBAR_HEIGHT - constants.STATUS_BAR_HEIGHT,
       ),
     };
+  }
+
+  subscribe() {
+    SocketService.getInstance().connectSocket(WS_BASE, this.props.authToken);
+    this.props.actions.subscribeOnNotifications();
   }
 
   _clampedScrollValue = 0;
@@ -125,6 +133,13 @@ class HomePage extends Component {
   _keyExtractor = (item, index) => index.toString();
 
   render() {
+    if (this.props.newNotification) {
+      PushNotification.localNotification({
+        title: 'My Notification Title',
+        message: 'My Notification Message',
+      });
+    }
+
     const {clampedScroll} = this.state;
 
     const navbarTranslate = clampedScroll.interpolate({
@@ -193,6 +208,7 @@ function mapStateToProps(state) {
     workers: state.workers.workers,
     authToken: state.user.token,
     loggedIn: state.user.loggedIn,
+    newNotification: state.notification.newNotification,
   };
 }
 
@@ -200,6 +216,14 @@ function mapDispatchToProps(dispatch) {
   return {
     actions: {
       allWorkers: bindActionCreators(workersActions.allWorkers, dispatch),
+      subscribeOnNotifications: bindActionCreators(
+        notificationActions.subscribeOnNotifications,
+        dispatch,
+      ),
+      confirmNotificationDelivered: bindActionCreators(
+        notificationActions.confirmNotificationDelivered,
+        dispatch,
+      ),
     },
   };
 }
