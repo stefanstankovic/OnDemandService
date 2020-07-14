@@ -2,6 +2,7 @@ import {authHeader} from '../helpers/auth-helper';
 import {API_BASE} from '../config';
 import {set} from 'lodash';
 import SocketService from './socket.service';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export const userService = {
   login,
@@ -34,6 +35,7 @@ function login(email, password) {
 function logout() {
   // remove user from local storage to log user out
   //localStorage.removeItem('user');
+  AsyncStorage.clear();
   SocketService.getInstance().disconnetFromSocket();
 }
 

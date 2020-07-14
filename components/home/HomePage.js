@@ -24,6 +24,9 @@ import {WS_BASE} from '../../config';
 import colors from '../common/colors';
 
 import PushNotification from 'react-native-push-notification';
+import {notificationService} from '../../services/notifications.service';
+
+import AsyncStorage from '@react-native-community/async-storage';
 
 const AnimatedListView = Animated.createAnimatedComponent(FlatList);
 const AnimatedHeader = Animated.createAnimatedComponent(Header);
@@ -54,18 +57,33 @@ class HomePage extends Component {
         constants.NAVBAR_HEIGHT - constants.STATUS_BAR_HEIGHT,
       ),
     };
+
+    PushNotification.configure({
+      onRegister: async function(token) {
+        console.log('TOKEN:', token);
+        await AsyncStorage.setItem('notification-token', token);
+        await notificationService.registerDevice(token, this.props.authToken);
+      },
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+      popInitialNotification: true,
+      requestPermissions: true,
+    });
   }
 
   subscribe() {
     SocketService.getInstance().connectSocket(WS_BASE, this.props.authToken);
-    this.props.actions.subscribeOnNotifications();
+    //this.props.actions.subscribeOnNotifications();
   }
 
   _clampedScrollValue = 0;
   _offsetValue = 0;
   _scrollValue = 0;
 
-  componentDidMount() {
+  async componentDidMount() {
     this.state.scrollAnim.addListener(({value}) => {
       const diff = value - this._scrollValue;
       this._scrollValue = value;
@@ -77,6 +95,9 @@ class HomePage extends Component {
     this.state.offsetAnim.addListener(({value}) => {
       this._offsetValue = value;
     });
+
+    await AsyncStorage.setItem('user', this.props.user);
+    await AsyncStorage.setItem('token', this.props.authToken);
   }
 
   componentWillUnmount() {
@@ -133,13 +154,6 @@ class HomePage extends Component {
   _keyExtractor = (item, index) => index.toString();
 
   render() {
-    if (this.props.newNotification) {
-      PushNotification.localNotification({
-        title: 'My Notification Title',
-        message: 'My Notification Message',
-      });
-    }
-
     const {clampedScroll} = this.state;
 
     const navbarTranslate = clampedScroll.interpolate({
@@ -207,6 +221,7 @@ function mapStateToProps(state) {
     loadingWorkers: state.workers.loadingWorkers,
     workers: state.workers.workers,
     authToken: state.user.token,
+    user: state.user.user,
     loggedIn: state.user.loggedIn,
     newNotification: state.notification.newNotification,
   };

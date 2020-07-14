@@ -7,6 +7,7 @@ export const notificationService = {
   updateNotification,
   getNotification,
   ackNotification,
+  registerDevice,
 };
 
 function allNotifications(token) {
@@ -66,6 +67,19 @@ function getNotification(id, token) {
   };
 
   return fetch(`${API_BASE}/notification/${id}`, requestOptions).then(
+    handleResponse,
+  );
+}
+
+function registerDevice(deviceId, token) {
+  let headers = authHeader(token);
+  set(headers, 'Content-Type', 'application/json');
+  const requestOptions = {
+    method: 'POST',
+    headers: headers,
+  };
+
+  return fetch(`${API_BASE}/notification/registerDevice`, requestOptions).then(
     handleResponse,
   );
 }

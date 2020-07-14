@@ -59,7 +59,6 @@ class ExitDialog extends Component {
     // alert(scene)
     if (scene !== 'login' || scene !== 'home' || scene !== 'homeScreen') {
       if (this.state.backClickCount === 1) {
-        this.props.loggedIn && this.props.actions.logout();
         BackHandler.exitApp();
       } else {
         this._spring();

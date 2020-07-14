@@ -3,6 +3,9 @@ import initialState from './initialState';
 
 export function user(state = initialState, action) {
   switch (action.type) {
+    case types.SET_USER: {
+      return {...state, user: action.user, token: action.token, loggedIn: true};
+    }
     case types.LOGIN_REQUEST:
       return {...state, isLoading: true};
     case types.LOGIN_SUCCESS:

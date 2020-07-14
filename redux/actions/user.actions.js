@@ -12,6 +12,9 @@ export const userActions = {
   updateUserDetails,
   updateUser,
 };
+export function setUser(user, token) {
+  return {type: types.SET_USER, user, token};
+}
 
 export function login(email, password) {
   return dispatch => {
