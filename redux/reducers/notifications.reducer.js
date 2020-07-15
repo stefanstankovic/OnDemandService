@@ -54,8 +54,6 @@ export function notification(
         isLoading: false,
         error: action.error,
       };
-    case types.NOTIFICATION_OPENED:
-      return state;
     default:
       return state;
   }

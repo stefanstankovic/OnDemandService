@@ -77,6 +77,9 @@ function registerDevice(deviceId, token) {
   const requestOptions = {
     method: 'POST',
     headers: headers,
+    body: JSON.stringify({
+      deviceId: deviceId,
+    }),
   };
 
   return fetch(`${API_BASE}/notification/registerDevice`, requestOptions).then(

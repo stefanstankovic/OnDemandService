@@ -12,6 +12,7 @@ import MapPage from './home/MapPage';
 import SettingsPage from './home/SettingsPage';
 import ProfileViewPage from './home/ProfileViewPage';
 import HireRequestPage from './home/HireRequestPage';
+import {InitialScreen} from './InitialScreen';
 
 import NotificationsPage from './notifications/NotificationsPage';
 import NotificationDetailsPage from './notifications/NotificationDetailsPage';
@@ -23,27 +24,35 @@ import {alertActions} from '../redux/actions/alert.actions';
 import styles from './common/styles';
 import colors from './common/colors';
 
-import PushNotification from 'react-native-push-notification';
+import AsyncStorage from '@react-native-community/async-storage';
+import * as constants from './common/constants';
+import {isNull} from 'lodash';
+import {userActions} from '../redux/actions/user.actions';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    PushNotification.configure({
-      onRegister: function(token) {
-        console.log('TOKEN:', token);
-      },
-      onNotification: function(notification) {
-        console.log('NOTIFICATION:', notification);
-        //notification.finish(PushNotificationIOS.FetchResult.NoData);
-      },
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true,
-      },
-      popInitialNotification: true,
-      requestPermissions: true,
-    });
+    this.state = {
+      isStarting: true,
+    };
+  }
+
+  async componentDidMount() {
+    const user = await AsyncStorage.getItem(constants.ASYNC_STORE_KEYS.USER);
+    const authToken = await AsyncStorage.getItem(
+      constants.ASYNC_STORE_KEYS.AUTH_TOKEN,
+    );
+
+    if (!isNull(user) && !isNull(authToken)) {
+      const userData = JSON.parse(user);
+      this.props.actions.setUser(userData, authToken);
+    }
+
+    this.appIsStarted();
+  }
+
+  appIsStarted() {
+    this.setState({isStarting: false});
   }
 
   render() {
@@ -52,13 +61,21 @@ class App extends React.Component {
         <Router sceneStyle={styles.scene}>
           <Scene key="root">
             <Scene
+              key="init"
+              title="Init"
+              hideNavBar
+              path="/init"
+              component={InitialScreen}
+              initial={this.state.isStarting}
+            />
+            <Scene
               key="login"
               title="Login"
               hideTabBar={true}
               hideNavBar={true}
               path="/login"
               component={LoginPage}
-              initial={!this.props.loggedIn}
+              initial={!this.state.isStarting && !this.props.loggedIn}
             />
             <Scene
               key="home"
@@ -67,7 +84,7 @@ class App extends React.Component {
               tabBarStyle={styles.tabBar}
               hideNavBar
               path="/home"
-              initial={this.props.loggedIn}>
+              initial={!this.state.isStarting && this.props.loggedIn}>
               <Scene
                 key="homeScreen"
                 tabBarLabel="Home"
@@ -173,6 +190,7 @@ function mapDispatchToProps(dispatch) {
   return {
     actions: {
       clear: bindActionCreators(alertActions.clear, dispatch),
+      setUser: bindActionCreators(userActions.setUser, dispatch),
     },
   };
 }

@@ -57,12 +57,23 @@ class HomePage extends Component {
         constants.NAVBAR_HEIGHT - constants.STATUS_BAR_HEIGHT,
       ),
     };
-
+    var _authToken = this.props.authToken;
     PushNotification.configure({
       onRegister: async function(token) {
         console.log('TOKEN:', token);
-        await AsyncStorage.setItem('notification-token', token);
-        await notificationService.registerDevice(token, this.props.authToken);
+        notificationService
+          .registerDevice(token.token, _authToken)
+          .then(() => {
+            AsyncStorage.setItem(
+              constants.ASYNC_STORE_KEYS.DEVICE_TOKEN,
+              token.token,
+            ).catch(ex => console.log(ex));
+          })
+          .catch(ex => console.log(ex));
+      },
+      onNotification: function(notification) {
+        console.log('NOTIFICATION:', notification);
+        //notification.finish(PushNotificationIOS.FetchResult.NoData);
       },
       permissions: {
         alert: true,
@@ -76,7 +87,7 @@ class HomePage extends Component {
 
   subscribe() {
     SocketService.getInstance().connectSocket(WS_BASE, this.props.authToken);
-    //this.props.actions.subscribeOnNotifications();
+    this.props.actions.subscribeOnNotifications();
   }
 
   _clampedScrollValue = 0;
@@ -96,8 +107,14 @@ class HomePage extends Component {
       this._offsetValue = value;
     });
 
-    await AsyncStorage.setItem('user', this.props.user);
-    await AsyncStorage.setItem('token', this.props.authToken);
+    await AsyncStorage.setItem(
+      constants.ASYNC_STORE_KEYS.USER,
+      JSON.stringify(this.props.user),
+    );
+    await AsyncStorage.setItem(
+      constants.ASYNC_STORE_KEYS.AUTH_TOKEN,
+      this.props.authToken,
+    );
   }
 
   componentWillUnmount() {
@@ -154,6 +171,13 @@ class HomePage extends Component {
   _keyExtractor = (item, index) => index.toString();
 
   render() {
+    if (this.props.newNotification) {
+      PushNotification.localNotification({
+        title: this.props.newNotification.title,
+        message: this.props.newNotification.subtitle,
+      });
+    }
+
     const {clampedScroll} = this.state;
 
     const navbarTranslate = clampedScroll.interpolate({

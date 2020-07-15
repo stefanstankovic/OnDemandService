@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {ScrollView, Platform} from 'react-native';
+import {ScrollView, Platform, BackHandler} from 'react-native';
 
 import {
   SettingsCategoryHeader,
@@ -8,6 +8,8 @@ import {
   SettingsDividerShort,
   SettingsSwitch,
 } from 'react-native-settings-components';
+
+import {Button} from 'react-native-elements';
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -20,6 +22,7 @@ import {
   SETTINGS_DIALOG_INPUT_TYPES,
 } from '../common/constants';
 import styles from '../common/styles';
+import formStyle from '../common/form.styles';
 
 class SettingsPage extends Component {
   constructor(props) {
@@ -31,6 +34,7 @@ class SettingsPage extends Component {
     };
 
     this.onValueChangeHandler = this.onValueChangeHandler.bind(this);
+    this.logout = this.logout.bind(this);
   }
 
   componentDidMount() {
@@ -66,6 +70,10 @@ class SettingsPage extends Component {
         this.setState({allowPushNotifications: value});
         break;
     }
+  }
+
+  logout() {
+    this.props.actions.logout(this.props.authToken);
   }
 
   render() {
@@ -154,6 +162,17 @@ class SettingsPage extends Component {
             false: colors.switchDisabled,
           }}
         />
+        <SettingsDividerShort />
+        <Button
+          buttonStyle={formStyle.buttonStyle}
+          containerStyle={{marginTop: 32, flex: 0}}
+          activeOpacity={0.8}
+          title={'LOGOUT'}
+          onPress={this.logout}
+          titleStyle={styles.loginTextButton}
+          loading={this.props.isLoading}
+          disabled={this.props.isLoading}
+        />
       </ScrollView>
     );
   }
@@ -165,6 +184,8 @@ function mapStateToProps(state) {
     user: state.user.user,
     authToken: state.user.token,
     userDetails: state.userDetails.userDetails,
+    isLoading: state.user.isLoading,
+    loggedOut: state.user.loggedOut,
   };
 }
 
@@ -177,6 +198,7 @@ function mapDispatchToProps(dispatch) {
         dispatch,
       ),
       updateUser: bindActionCreators(userActions.updateUser, dispatch),
+      logout: bindActionCreators(userActions.logout, dispatch),
     },
   };
 }

@@ -24,8 +24,19 @@ export function user(state = initialState, action) {
       return {...state, isLoading: false, user: action.user};
     case types.UPDATE_USER_FAILURE:
       return {...state, isLoading: false};
-    case types.LOGOUT:
-      return {...state, loggedIn: false, user: {}, token: '', isLoading: false};
+    case types.LOGOUT_REQUEST:
+      return {...state, isLoading: false};
+    case types.LOGOUT_SUCCESS:
+      return {
+        ...state,
+        loggedIn: false,
+        user: {},
+        token: '',
+        isLoading: false,
+        loggedOut: true,
+      };
+    case types.LOGOUT_FAILURE:
+      return {...state, isLoading: false};
     case types.REGISTER_REQUEST:
       return {
         ...state,
