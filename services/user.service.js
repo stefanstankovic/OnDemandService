@@ -2,7 +2,8 @@ import {authHeader} from '../helpers/auth-helper';
 import {API_BASE} from '../config';
 import {set} from 'lodash';
 import SocketService from './socket.service';
-
+import AsyncStorage from '@react-native-community/async-storage';
+import {ASYNC_STORE_KEYS} from '../components/common/constants';
 export const userService = {
   login,
   logout,
@@ -31,10 +32,35 @@ function login(email, password) {
     });
 }
 
-function logout() {
+async function logout(token) {
   // remove user from local storage to log user out
   //localStorage.removeItem('user');
+
+  await AsyncStorage.removeItem(ASYNC_STORE_KEYS.USER);
+  await AsyncStorage.removeItem(ASYNC_STORE_KEYS.AUTH_TOKEN);
+  const deviceId = await AsyncStorage.getItem(ASYNC_STORE_KEYS.DEVICE_TOKEN);
+  await AsyncStorage.removeItem(ASYNC_STORE_KEYS.DEVICE_TOKEN);
+  await AsyncStorage.clear();
+
   SocketService.getInstance().disconnetFromSocket();
+
+  let headers = authHeader(token);
+  set(headers, 'Content-Type', 'application/json');
+  const requestOptions = {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({deviceId: deviceId}),
+  };
+
+  return fetch(`${API_BASE}/user/logout`, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      if (!response.success) {
+        return Promise.reject(response.message);
+      }
+
+      return Promise.resolve(response);
+    });
 }
 
 function getAll() {

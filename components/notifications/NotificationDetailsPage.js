@@ -24,6 +24,7 @@ import defaultStyles from '../common/styles';
 import formStyles from '../common/form.styles';
 import * as constants from '../common/constants';
 import {isString, isEmpty, isUndefined} from 'lodash';
+import {Actions} from 'react-native-router-flux';
 
 class NotificationsDetailsPage extends Component {
   constructor(props) {
@@ -34,6 +35,7 @@ class NotificationsDetailsPage extends Component {
       isCommentValid: true,
       isAccepted: 0,
       stars: 1,
+      respiringOnNotification: false,
     };
 
     this.props.actions.getNotification(
@@ -164,6 +166,7 @@ class NotificationsDetailsPage extends Component {
   };
 
   submitHireRequest = () => {
+    this.setState({respiringOnNotification: true});
     this.props.actions.hireWorkerResponse(
       this.props.additionalInfo.itemId,
       this.state.isAccepted === 0,
@@ -173,6 +176,7 @@ class NotificationsDetailsPage extends Component {
   };
 
   confirmJob = () => {
+    this.setState({respiringOnNotification: true});
     this.props.actions.confirmJob(
       this.props.additionalInfo.itemId,
       this.props.additionalInfo.workerId,
@@ -181,6 +185,7 @@ class NotificationsDetailsPage extends Component {
   };
 
   submitRank = () => {
+    this.setState({respiringOnNotification: true});
     this.props.actions.addRank(
       this.props.additionalInfo.userId,
       this.state.stars,
@@ -459,6 +464,15 @@ class NotificationsDetailsPage extends Component {
   }
 
   render() {
+    if (
+      !this.props.workerIsLoading &&
+      !this.props.rankIsLoading &&
+      this.state.respiringOnNotification &&
+      isUndefined(this.props.workerError) &&
+      isUndefined(this.rankError)
+    ) {
+      Actions.pop();
+    }
     return this.renderScreen(this.props.isLoading);
   }
 }
@@ -471,6 +485,8 @@ function mapStateToProps(state) {
     authToken: state.user.token,
     workerIsLoading: state.workers.isLoading,
     rankIsLoading: state.rank.isLoading,
+    workerError: state.workers.error,
+    rankError: state.rank.error,
   };
 }
 

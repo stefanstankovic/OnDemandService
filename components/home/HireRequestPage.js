@@ -26,6 +26,7 @@ class HireRequestPage extends Component {
       isWhenValid: true,
       isWhereValid: true,
       isCommentValid: true,
+      hiringWorker: false,
     };
 
     this._submit = this._submit.bind(this);
@@ -62,22 +63,24 @@ class HireRequestPage extends Component {
       return;
     }
 
+    this.setState({hiringWorker: true});
+
     this.props.actions.hireWorker(
       this.props.worker.id,
       `${when}|${where}|${comment}`,
       this.props.authToken,
     );
-
-    if (
-      !this.props.isLoading &&
-      isUndefined(this.props.hiredWorkerId) &&
-      !isUndefined(this.props.error)
-    ) {
-      Actions.pop({hiredWorker: true, workerId: this.props.hiredWorkerId});
-    }
   }
 
   render() {
+    if (
+      this.state.hiringWorker &&
+      !this.props.isLoading &&
+      isUndefined(this.props.error)
+    ) {
+      Actions.pop({hiredWorker: true, workerId: this.props.hiredWorkerId});
+    }
+
     return (
       <KeyboardAvoidingView style={styles.container}>
         <ImageBackground

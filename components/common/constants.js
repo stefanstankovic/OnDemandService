@@ -53,3 +53,9 @@ export const HIRE_REQUEST_STATUS = {
   REJECTED: 'declined',
   CONFIRMS: 'confirmed',
 };
+
+export const ASYNC_STORE_KEYS = {
+  USER: 'user',
+  AUTH_TOKEN: 'auth-token',
+  DEVICE_TOKEN: 'device-token',
+};

@@ -11,7 +11,11 @@ export const userActions = {
   getUserDetails,
   updateUserDetails,
   updateUser,
+  setUser,
 };
+export function setUser(user, token) {
+  return {type: types.SET_USER, user, token};
+}
 
 export function login(email, password) {
   return dispatch => {
@@ -43,9 +47,35 @@ export function login(email, password) {
   }
 }
 
-export function logout() {
-  userService.logout();
-  return {type: types.LOGOUT};
+export function logout(token) {
+  return dispatch => {
+    dispatch(request());
+
+    userService.logout(token).then(
+      response => {
+        console.log(response);
+        if (!response.success) {
+          dispatch(failure(response.message));
+          dispatch(alertActions.error(response.message));
+        }
+        dispatch(success());
+      },
+      error => {
+        dispatch(failure(error));
+        dispatch(alertActions.error(error));
+      },
+    );
+  };
+
+  function request() {
+    return {type: types.LOGOUT_REQUEST};
+  }
+  function success() {
+    return {type: types.LOGOUT_SUCCESS};
+  }
+  function failure(error) {
+    return {type: types.LOGOUT_FAILURE, error};
+  }
 }
 
 export function register(user) {

@@ -26,7 +26,11 @@ export function workers(
         workerId: undefined,
       };
     case types.HIRE_WORKER_SUCCESS:
-      return {...state, isLoading: false, workerId: action.workerId};
+      return {
+        ...state,
+        isLoading: false,
+        workerId: action.workerId,
+      };
     case types.WORKER_RESPONSE_REQUEST:
       return {...state, isLoading: true, error: undefined};
     case types.WORKER_RESPONSE_FAILURE:

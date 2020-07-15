@@ -10,6 +10,7 @@ import {
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {workersActions} from '../../redux/actions/workers.actions';
+import {notificationActions} from '../../redux/actions/notifications.actions';
 
 import {Actions} from 'react-native-router-flux';
 
@@ -22,6 +23,11 @@ import SocketService from '../../services/socket.service';
 import {WS_BASE} from '../../config';
 import colors from '../common/colors';
 
+import PushNotification from 'react-native-push-notification';
+import {notificationService} from '../../services/notifications.service';
+
+import AsyncStorage from '@react-native-community/async-storage';
+
 const AnimatedListView = Animated.createAnimatedComponent(FlatList);
 const AnimatedHeader = Animated.createAnimatedComponent(Header);
 
@@ -33,7 +39,7 @@ class HomePage extends Component {
     const offsetAnim = new Animated.Value(0);
 
     this.props.actions.allWorkers(this.props.authToken);
-    SocketService.getInstance().connectSocket(WS_BASE, this.props.authToken);
+    this.subscribe();
 
     this.state = {
       scrollAnim,
@@ -51,13 +57,44 @@ class HomePage extends Component {
         constants.NAVBAR_HEIGHT - constants.STATUS_BAR_HEIGHT,
       ),
     };
+    var _authToken = this.props.authToken;
+    PushNotification.configure({
+      onRegister: async function(token) {
+        console.log('TOKEN:', token);
+        notificationService
+          .registerDevice(token.token, _authToken)
+          .then(() => {
+            AsyncStorage.setItem(
+              constants.ASYNC_STORE_KEYS.DEVICE_TOKEN,
+              token.token,
+            ).catch(ex => console.log(ex));
+          })
+          .catch(ex => console.log(ex));
+      },
+      onNotification: function(notification) {
+        console.log('NOTIFICATION:', notification);
+        //notification.finish(PushNotificationIOS.FetchResult.NoData);
+      },
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+      popInitialNotification: true,
+      requestPermissions: true,
+    });
+  }
+
+  subscribe() {
+    SocketService.getInstance().connectSocket(WS_BASE, this.props.authToken);
+    this.props.actions.subscribeOnNotifications();
   }
 
   _clampedScrollValue = 0;
   _offsetValue = 0;
   _scrollValue = 0;
 
-  componentDidMount() {
+  async componentDidMount() {
     this.state.scrollAnim.addListener(({value}) => {
       const diff = value - this._scrollValue;
       this._scrollValue = value;
@@ -69,6 +106,15 @@ class HomePage extends Component {
     this.state.offsetAnim.addListener(({value}) => {
       this._offsetValue = value;
     });
+
+    await AsyncStorage.setItem(
+      constants.ASYNC_STORE_KEYS.USER,
+      JSON.stringify(this.props.user),
+    );
+    await AsyncStorage.setItem(
+      constants.ASYNC_STORE_KEYS.AUTH_TOKEN,
+      this.props.authToken,
+    );
   }
 
   componentWillUnmount() {
@@ -125,6 +171,13 @@ class HomePage extends Component {
   _keyExtractor = (item, index) => index.toString();
 
   render() {
+    if (this.props.newNotification) {
+      PushNotification.localNotification({
+        title: this.props.newNotification.title,
+        message: this.props.newNotification.subtitle,
+      });
+    }
+
     const {clampedScroll} = this.state;
 
     const navbarTranslate = clampedScroll.interpolate({
@@ -192,7 +245,9 @@ function mapStateToProps(state) {
     loadingWorkers: state.workers.loadingWorkers,
     workers: state.workers.workers,
     authToken: state.user.token,
+    user: state.user.user,
     loggedIn: state.user.loggedIn,
+    newNotification: state.notification.newNotification,
   };
 }
 
@@ -200,6 +255,14 @@ function mapDispatchToProps(dispatch) {
   return {
     actions: {
       allWorkers: bindActionCreators(workersActions.allWorkers, dispatch),
+      subscribeOnNotifications: bindActionCreators(
+        notificationActions.subscribeOnNotifications,
+        dispatch,
+      ),
+      confirmNotificationDelivered: bindActionCreators(
+        notificationActions.confirmNotificationDelivered,
+        dispatch,
+      ),
     },
   };
 }

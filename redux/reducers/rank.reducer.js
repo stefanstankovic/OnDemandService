@@ -1,6 +1,9 @@
 import * as types from '../actions/actionTypes';
 
-export function rank(state = {ranks: [], isLoading: false}, action) {
+export function rank(
+  state = {ranks: [], isLoading: false, error: undefined},
+  action,
+) {
   switch (action.type) {
     case types.ALL_RANKS_REQUEST:
       return {...state, isLoading: true, ranks: []};

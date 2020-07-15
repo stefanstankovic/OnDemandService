@@ -1,9 +1,12 @@
 import * as types from './actionTypes';
 
 export const locationActions = {
-  locationChaged,
+  locationChanged,
+  subscribeOnLocationChanged,
 };
 
-function locationChaged(location) {
-  return {type: types.LOCATION_CHANGES, location};
+function locationChanged(workerId, location, token) {
+  return {type: types.LOCATION_CHANGES};
 }
+
+function subscribeOnLocationChanged(userId, token) {}
