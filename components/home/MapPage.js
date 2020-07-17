@@ -3,6 +3,8 @@ import React, {Component} from 'react';
 import MapView, {Marker, Polyline, PROVIDER_GOOGLE} from 'react-native-maps';
 
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+
 import Geolocation from '@react-native-community/geolocation';
 
 import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
@@ -10,12 +12,16 @@ import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
 import styles from '../common/styles';
 import * as constants from '../common/constants';
 
+import {locationActions} from '../../redux/actions/location.actions';
+import {locationService} from '../../services/location.service';
+
 class MapPage extends Component {
+  regionChangedInterval = undefined;
+
   constructor(props) {
     super(props);
-    this.state = {polyline: []};
-
-    this.getPermissions();
+    this.state = {};
+    this.onRegionChange = this.onRegionChange.bind(this);
   }
 
   getPermissions() {
@@ -50,37 +56,22 @@ class MapPage extends Component {
           },
         });
       },
-      error => alert(JSON.stringify(error)),
+      error => console.log(JSON.stringify(error)),
       {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
     );
   }
 
   componentDidMount() {
-    this.watchID = Geolocation.watchPosition(
-      ({coords}) => {
-        const {latitude, longitude} = coords;
-        let polyline = [...this.state.polyline];
-        polyline.push({
-          latitude: latitude,
-          longitude: longitude,
-        });
-        this.setState({
-          position: {
-            latitude,
-            longitude,
-          },
-          markers: [
-            {
-              latitude: latitude,
-              longitude: longitude,
-            },
-          ],
-          polyline,
-        });
+    this.getPermissions();
+    this.props.actions.allWorkers(this.props.authToken);
+    this.props.actions.subscribeOnLocationChange();
 
-        this.getPermissions();
+    this.watchID = Geolocation.watchPosition(
+      async ({coords}) => {
+        const {latitude, longitude} = coords;
+        await this.uploadPosition(latitude, longitude);
       },
-      error => alert(JSON.stringify(error)),
+      error => console.log(JSON.stringify(error)),
       {
         distanceFilter: 100,
         enableHighAccuracy: true,
@@ -88,8 +79,75 @@ class MapPage extends Component {
     );
   }
 
+  async uploadPosition(latitude, longitude) {
+    const {user, authToken} = this.props;
+
+    if (user.role !== constants.USER_ROLE.WORKER) {
+      return;
+    }
+
+    try {
+      await locationService.addNewLocation(
+        user.id,
+        latitude,
+        longitude,
+        authToken,
+      );
+    } catch (ex) {
+      console.log(ex);
+    }
+  }
+
   componentWillUnmount() {
     Geolocation.clearWatch(this.watchID);
+  }
+
+  drawPoly(workers) {
+    let workersWithLocation = workers.filter(
+      worker => worker.location.length > 0,
+    );
+    return workersWithLocation.map((worker, index) => {
+      const orderedLocation = [...worker.location];
+      orderedLocation.sort((l1, l2) => {
+        return new Date(l1.createdAt) - new Date(l2.createdAt);
+      });
+
+      const polyline = worker.location.map(({latitude, longitude}) => {
+        return {
+          latitude,
+          longitude,
+        };
+      });
+      return <Polyline key={'polyiline' + index} coordinates={polyline} />;
+    });
+  }
+
+  addMarkers(workers) {
+    let workersWithLocation = workers.filter(
+      worker => worker.location.length > 0,
+    );
+    return workersWithLocation.map((worker, index) => {
+      const {latitude, longitude} = worker.location[worker.location.length - 1];
+      return (
+        <Marker
+          key={'index' + index}
+          draggable
+          coordinate={{latitude, longitude}}
+          //onDragEnd={e => alert(JSON.stringify(e.nativeEvent.coordinate))}
+          title={worker.workerDetails.name ?? `Worker: ${index}`}
+          description={worker.workerDetails.mobile ?? "mobile isn't set!"}
+        />
+      );
+    });
+  }
+
+  onRegionChange(region) {
+    if (this.regionChangedInterval) {
+      clearInterval(this.regionChangedInterval);
+    }
+    this.regionChangedInterval = setInterval(() => {
+      this.setState({region});
+    }, 1000);
   }
 
   render() {
@@ -112,14 +170,6 @@ class MapPage extends Component {
       };
     };
 
-    let polyline;
-
-    if (this.state.polyline.length > 5) {
-      polyline = (
-        <Polyline key="polyiline1" coordinates={this.state.polyline} />
-      );
-    }
-
     return (
       <View style={styles.mapContainer}>
         <View style={bbStyle(varTop)}>
@@ -135,27 +185,37 @@ class MapPage extends Component {
           provider={PROVIDER_GOOGLE}
           style={styles.map}
           region={this.state.region}
+          onRegionChange={this.onRegionChange}
           showsUserLocation={true}>
-          {this.state.markers !== undefined &&
-            this.state.markers.map((marker, index) => {
-              return (
-                <Marker
-                  key={'index' + index}
-                  draggable
-                  coordinate={marker}
-                  onDragEnd={e =>
-                    alert(JSON.stringify(e.nativeEvent.coordinate))
-                  }
-                  title={'Test Marker'}
-                  description={'This is a description of the marker'}
-                />
-              );
-            })}
-          {polyline}
+          {this.addMarkers(this.props.workers)}
+          {this.drawPoly(this.props.workers)}
         </MapView>
       </View>
     );
   }
 }
 
-export default connect()(MapPage);
+function mapStateToProps(state) {
+  return {
+    authToken: state.user.token,
+    user: state.user.user,
+    workers: state.location.workers,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: {
+      allWorkers: bindActionCreators(locationActions.allWorkers, dispatch),
+      subscribeOnLocationChange: bindActionCreators(
+        locationActions.subscribeOnLocationChange,
+        dispatch,
+      ),
+    },
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(MapPage);

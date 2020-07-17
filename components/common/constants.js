@@ -59,3 +59,9 @@ export const ASYNC_STORE_KEYS = {
   AUTH_TOKEN: 'auth-token',
   DEVICE_TOKEN: 'device-token',
 };
+
+export const USER_ROLE = {
+  USER: 'user',
+  WORKER: 'worker',
+  ADMIN: 'admin',
+};

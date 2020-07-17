@@ -9,6 +9,7 @@ export const notificationActions = {
   notificationDetailsClosed,
   subscribeOnNotifications,
   confirmNotificationDelivered,
+  cleanNewNotifications,
 };
 
 export function allNotifications(token) {
@@ -89,6 +90,10 @@ export function subscribeOnNotifications() {
         dispatch({type: types.NEW_NOTIFICATION, notification: args[0]});
       });
   };
+}
+
+export function cleanNewNotifications() {
+  return {type: types.CLEAN_NEW_NOTIFICATION};
 }
 
 export function confirmNotificationDelivered(notificationId, token) {

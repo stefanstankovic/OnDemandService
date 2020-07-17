@@ -60,7 +60,6 @@ class HomePage extends Component {
     var _authToken = this.props.authToken;
     PushNotification.configure({
       onRegister: async function(token) {
-        console.log('TOKEN:', token);
         notificationService
           .registerDevice(token.token, _authToken)
           .then(() => {
@@ -176,6 +175,7 @@ class HomePage extends Component {
         title: this.props.newNotification.title,
         message: this.props.newNotification.subtitle,
       });
+      this.props.actions.cleanNewNotifications();
     }
 
     const {clampedScroll} = this.state;
@@ -261,6 +261,10 @@ function mapDispatchToProps(dispatch) {
       ),
       confirmNotificationDelivered: bindActionCreators(
         notificationActions.confirmNotificationDelivered,
+        dispatch,
+      ),
+      cleanNewNotifications: bindActionCreators(
+        notificationActions.cleanNewNotifications,
         dispatch,
       ),
     },

@@ -464,15 +464,15 @@ class NotificationsDetailsPage extends Component {
   }
 
   render() {
-    if (
-      !this.props.workerIsLoading &&
-      !this.props.rankIsLoading &&
-      this.state.respiringOnNotification &&
-      isUndefined(this.props.workerError) &&
-      isUndefined(this.rankError)
-    ) {
-      Actions.pop();
-    }
+    // if (
+    //   !this.props.workerIsLoading &&
+    //   !this.props.rankIsLoading &&
+    //   this.state.respiringOnNotification &&
+    //   isUndefined(this.props.workerError) &&
+    //   isUndefined(this.rankError)
+    // ) {
+    //   Actions.pop();
+    // }
     return this.renderScreen(this.props.isLoading);
   }
 }

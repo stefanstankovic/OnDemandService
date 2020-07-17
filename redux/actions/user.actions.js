@@ -53,7 +53,6 @@ export function logout(token) {
 
     userService.logout(token).then(
       response => {
-        console.log(response);
         if (!response.success) {
           dispatch(failure(response.message));
           dispatch(alertActions.error(response.message));
