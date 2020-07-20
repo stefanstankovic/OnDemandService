@@ -58,6 +58,7 @@ export const ASYNC_STORE_KEYS = {
   USER: 'user',
   AUTH_TOKEN: 'auth-token',
   DEVICE_TOKEN: 'device-token',
+  GEOLOCATION_WATCH_ID: 'geolocation-watch-id',
 };
 
 export const USER_ROLE = {

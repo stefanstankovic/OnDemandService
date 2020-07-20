@@ -4,6 +4,8 @@ import {set} from 'lodash';
 import SocketService from './socket.service';
 import AsyncStorage from '@react-native-community/async-storage';
 import {ASYNC_STORE_KEYS} from '../components/common/constants';
+import {locationService} from './location.service';
+
 export const userService = {
   login,
   logout,
@@ -41,6 +43,7 @@ async function logout(token) {
   const deviceId = await AsyncStorage.getItem(ASYNC_STORE_KEYS.DEVICE_TOKEN);
   await AsyncStorage.removeItem(ASYNC_STORE_KEYS.DEVICE_TOKEN);
   await AsyncStorage.clear();
+  await locationService.clearWatchLocation();
 
   SocketService.getInstance().disconnetFromSocket();
 

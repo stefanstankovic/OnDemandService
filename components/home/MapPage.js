@@ -7,8 +7,6 @@ import {bindActionCreators} from 'redux';
 
 import Geolocation from '@react-native-community/geolocation';
 
-import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
-
 import styles from '../common/styles';
 import * as constants from '../common/constants';
 
@@ -22,21 +20,6 @@ class MapPage extends Component {
     super(props);
     this.state = {};
     this.onRegionChange = this.onRegionChange.bind(this);
-  }
-
-  getPermissions() {
-    RNAndroidLocationEnabler.promptForEnableLocationIfNeeded({
-      interval: 10000,
-      fastInterval: 5000,
-    }).then(data => {
-      if (data === 'already-enabled') {
-        this.findMe();
-      } else {
-        setTimeout(() => {
-          this.findMe();
-        }, 1000);
-      }
-    });
   }
 
   findMe() {
@@ -61,45 +44,13 @@ class MapPage extends Component {
     );
   }
 
-  componentDidMount() {
-    this.getPermissions();
+  async componentDidMount() {
+    if (await locationService.getPermissions()) {
+      this.findMe();
+    }
+
     this.props.actions.allWorkers(this.props.authToken);
     this.props.actions.subscribeOnLocationChange();
-
-    this.watchID = Geolocation.watchPosition(
-      async ({coords}) => {
-        const {latitude, longitude} = coords;
-        await this.uploadPosition(latitude, longitude);
-      },
-      error => console.log(JSON.stringify(error)),
-      {
-        distanceFilter: 100,
-        enableHighAccuracy: true,
-      },
-    );
-  }
-
-  async uploadPosition(latitude, longitude) {
-    const {user, authToken} = this.props;
-
-    if (user.role !== constants.USER_ROLE.WORKER) {
-      return;
-    }
-
-    try {
-      await locationService.addNewLocation(
-        user.id,
-        latitude,
-        longitude,
-        authToken,
-      );
-    } catch (ex) {
-      console.log(ex);
-    }
-  }
-
-  componentWillUnmount() {
-    Geolocation.clearWatch(this.watchID);
   }
 
   drawPoly(workers) {
@@ -177,7 +128,7 @@ class MapPage extends Component {
             hitSlop={hitSlop}
             activeOpacity={constants.ACTIVE_OPACITY}
             style={styles.mapButton}
-            onPress={() => this.getPermissions()}>
+            onPress={() => this.findMe()}>
             <Text style={styles.findMeText}>Find Me</Text>
           </TouchableOpacity>
         </View>

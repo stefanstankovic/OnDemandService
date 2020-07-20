@@ -27,6 +27,7 @@ import PushNotification from 'react-native-push-notification';
 import {notificationService} from '../../services/notifications.service';
 
 import AsyncStorage from '@react-native-community/async-storage';
+import {locationService} from '../../services/location.service';
 
 const AnimatedListView = Animated.createAnimatedComponent(FlatList);
 const AnimatedHeader = Animated.createAnimatedComponent(Header);
@@ -114,6 +115,8 @@ class HomePage extends Component {
       constants.ASYNC_STORE_KEYS.AUTH_TOKEN,
       this.props.authToken,
     );
+
+    await locationService.startWatchLocation();
   }
 
   componentWillUnmount() {

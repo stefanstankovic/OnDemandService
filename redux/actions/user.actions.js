@@ -158,8 +158,8 @@ export function updateUser(user, token) {
   function request() {
     return {type: types.UPDATE_USER_REQUEST};
   }
-  function success(user) {
-    return {type: types.UPDATE_USER_SUCCESS, user};
+  function success(userResponse) {
+    return {type: types.UPDATE_USER_SUCCESS, user: userResponse};
   }
   function failure(error) {
     return {type: types.UPDATE_USER_FAILURE, error};
@@ -213,8 +213,11 @@ export function updateUserDetails(userDetails, token) {
   function request() {
     return {type: types.UPDATE_USER_DETAILS_REQUEST};
   }
-  function success(userDetails) {
-    return {type: types.UPDATE_USER_DETAILS_SUCCESS, userDetails: userDetails};
+  function success(userDetailsResponse) {
+    return {
+      type: types.UPDATE_USER_DETAILS_SUCCESS,
+      userDetails: userDetailsResponse,
+    };
   }
   function failure(error) {
     return {type: types.UPDATE_USER_DETAILS_FAILURE, error};
