@@ -54,6 +54,8 @@ export function notification(
         isLoading: false,
         error: action.error,
       };
+    case types.CLEAN_NEW_NOTIFICATION:
+      return {...state, newNotification: undefined};
     default:
       return state;
   }
