@@ -119,6 +119,7 @@ async function startWatchLocation() {
   if (TaskManager.isTaskDefined(LOCATION_TASK_NAME)) {
     return;
   }
+
   TaskManager.defineTask(LOCATION_TASK_NAME, async ({data, error}) => {
     if (error) {
       console.error(error);
@@ -137,8 +138,7 @@ async function startWatchLocation() {
 
   await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
     accuracy: Location.Accuracy.Balanced,
-    timeInterval: 50000,
-    distanceInterval: 300,
+    distanceInterval: 100,
     showsBackgroundLocationIndicator: true,
   });
 }
@@ -150,7 +150,14 @@ async function clearWatchLocation() {
   );
   Geolocation.clearWatch(watchID);
   */
+  if (!TaskManager.isTaskDefined(LOCATION_TASK_NAME)) {
+    return;
+  }
 
-  await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-  await TaskManager.unregisterTaskAsync(LOCATION_TASK_NAME);
+  try {
+    await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+    await TaskManager.unregisterTaskAsync(LOCATION_TASK_NAME);
+  } catch (err) {
+    console.error(err);
+  }
 }
