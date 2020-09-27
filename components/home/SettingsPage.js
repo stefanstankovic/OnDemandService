@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {ScrollView, Platform, BackHandler} from 'react-native';
+import {ScrollView, Platform} from 'react-native';
 
 import {
   SettingsCategoryHeader,
@@ -16,6 +16,8 @@ import {bindActionCreators} from 'redux';
 
 import {userActions} from '../../redux/actions/user.actions';
 
+import {notificationService} from '../../services/notifications.service';
+
 import * as colors from '../common/colors';
 import {
   SETTINGS_PROPERTIES,
@@ -23,6 +25,11 @@ import {
 } from '../common/constants';
 import styles from '../common/styles';
 import formStyle from '../common/form.styles';
+import AsyncStorage from '@react-native-community/async-storage';
+import {ASYNC_STORE_KEYS} from '../common/constants';
+import {isNull, isString} from 'lodash';
+
+import NotificationService from '../../services/pushNotification.service';
 
 class SettingsPage extends Component {
   constructor(props) {
@@ -30,18 +37,26 @@ class SettingsPage extends Component {
     this.state = {
       username: '',
       gender: '',
-      allowPushNotifications: false,
+      allowPushNotifications: true,
     };
 
     this.onValueChangeHandler = this.onValueChangeHandler.bind(this);
     this.logout = this.logout.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.props.actions.getUserDetails(this.props.user.id, this.props.authToken);
+
+    const receiveNotification = await AsyncStorage.getItem(
+      ASYNC_STORE_KEYS.RECEIVE_NOTIFICATIONS,
+    );
+
+    if (!isNull(receiveNotification) && isString(receiveNotification)) {
+      this.setState({allowPushNotifications: receiveNotification === 'true'});
+    }
   }
 
-  onValueChangeHandler(property, value) {
+  async onValueChangeHandler(property, value) {
     let user = {...this.props.user};
     let userDetails = {...this.props.userDetails};
 
@@ -68,12 +83,32 @@ class SettingsPage extends Component {
         break;
       case SETTINGS_PROPERTIES.PUSH_NOTIFICATIONS:
         this.setState({allowPushNotifications: value});
+        await AsyncStorage.setItem(
+          ASYNC_STORE_KEYS.RECEIVE_NOTIFICATIONS,
+          value.toString(),
+        );
+
+        const deviceToken = await AsyncStorage.getItem(
+          ASYNC_STORE_KEYS.DEVICE_TOKEN,
+        );
+
+        if (value) {
+          notificationService
+            .registerDevice(deviceToken, this.props.authToken)
+            .catch(ex => console.log(ex));
+        } else {
+          notificationService
+            .unregisterDevice(deviceToken, this.props.authToken)
+            .catch(ex => console.log(ex));
+        }
+
         break;
     }
   }
 
   logout() {
     this.props.actions.logout(this.props.authToken);
+    NotificationService.getInstance().clearAllNotifications();
   }
 
   render() {
@@ -88,7 +123,7 @@ class SettingsPage extends Component {
           title="Email"
           dialogDescription={'Enter your username.'}
           valuePlaceholder="..."
-          positiveButtonTitle={'...'}
+          positiveButtonTitle={'Save'}
           negativeButtonTitle={'Cancel'}
           buttonRightTitle={'Save'}
           androidDialogInputType={SETTINGS_DIALOG_INPUT_TYPES.EMAIL_ADDRESS}
@@ -101,20 +136,20 @@ class SettingsPage extends Component {
           title="Phone"
           dialogDescription={'Enter your username.'}
           valuePlaceholder="..."
-          positiveButtonTitle={'...'}
+          positiveButtonTitle={'Save'}
           negativeButtonTitle={'Cancel'}
           buttonRightTitle={'Save'}
           androidDialogInputType={SETTINGS_DIALOG_INPUT_TYPES.PHONE_PAD}
           onValueChange={value =>
             this.onValueChangeHandler(SETTINGS_PROPERTIES.PHONE, value)
           }
-          value={this.props.user.mobile || '...'}
+          value={this.props.user.mobile || ''}
         />
         <SettingsEditText
           title="Password"
           dialogDescription={'Enter your username.'}
           valuePlaceholder="..."
-          positiveButtonTitle={'...'}
+          positiveButtonTitle={'Save'}
           negativeButtonTitle={'Cancel'}
           buttonRightTitle={'Save'}
           androidDialogInputType={SETTINGS_DIALOG_INPUT_TYPES.PASSWORD}
@@ -127,25 +162,25 @@ class SettingsPage extends Component {
           title="First Name"
           dialogDescription={'Enter your username.'}
           valuePlaceholder="..."
-          positiveButtonTitle={'...'}
+          positiveButtonTitle={'Save'}
           negativeButtonTitle={'Cancel'}
           buttonRightTitle={'Save'}
           onValueChange={value =>
             this.onValueChangeHandler(SETTINGS_PROPERTIES.FIRST_NAME, value)
           }
-          value={this.props.userDetails.firstName || '...'}
+          value={this.props.userDetails.firstName || ''}
         />
         <SettingsEditText
           title="Last Name"
           dialogDescription={'Enter your username.'}
           valuePlaceholder="..."
-          positiveButtonTitle={'...'}
+          positiveButtonTitle={'Save'}
           negativeButtonTitle={'Cancel'}
           buttonRightTitle={'Save'}
           onValueChange={value =>
             this.onValueChangeHandler(SETTINGS_PROPERTIES.LAST_NAME, value)
           }
-          value={this.props.userDetails.lastName || '...'}
+          value={this.props.userDetails.lastName || ''}
         />
         <SettingsDividerShort />
         <SettingsSwitch

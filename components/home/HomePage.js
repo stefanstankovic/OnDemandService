@@ -23,11 +23,13 @@ import SocketService from '../../services/socket.service';
 import {WS_BASE} from '../../config';
 import colors from '../common/colors';
 
-import PushNotification from 'react-native-push-notification';
 import {notificationService} from '../../services/notifications.service';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import {locationService} from '../../services/location.service';
+import {isEmpty} from 'lodash';
+
+import NotificationService from '../../services/pushNotification.service';
 
 const AnimatedListView = Animated.createAnimatedComponent(FlatList);
 const AnimatedHeader = Animated.createAnimatedComponent(Header);
@@ -40,6 +42,12 @@ class HomePage extends Component {
     const offsetAnim = new Animated.Value(0);
 
     this.props.actions.allWorkers(this.props.authToken);
+
+    NotificationService.getInstance().setListeners(
+      this.onRegister.bind(this),
+      this.onNotif.bind(this),
+    );
+
     this.subscribe();
 
     this.state = {
@@ -58,31 +66,24 @@ class HomePage extends Component {
         constants.NAVBAR_HEIGHT - constants.STATUS_BAR_HEIGHT,
       ),
     };
-    var _authToken = this.props.authToken;
-    PushNotification.configure({
-      onRegister: async function(token) {
-        notificationService
-          .registerDevice(token.token, _authToken)
-          .then(() => {
-            AsyncStorage.setItem(
-              constants.ASYNC_STORE_KEYS.DEVICE_TOKEN,
-              token.token,
-            ).catch(ex => console.log(ex));
-          })
-          .catch(ex => console.log(ex));
-      },
-      onNotification: function(notification) {
-        console.log('NOTIFICATION:', notification);
-        //notification.finish(PushNotificationIOS.FetchResult.NoData);
-      },
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true,
-      },
-      popInitialNotification: true,
-      requestPermissions: true,
-    });
+  }
+
+  onRegister(token) {
+    this.setState({registerToken: token.token, fcmRegistered: true});
+    notificationService
+      .registerDevice(token.token, this.props.authToken)
+      .then(async () => {
+        await AsyncStorage.setItem(
+          constants.ASYNC_STORE_KEYS.DEVICE_TOKEN,
+          token.token,
+        ).catch(ex => console.log(ex));
+      })
+      .catch(ex => console.log(ex));
+  }
+
+  onNotif(notif) {
+    NotificationService.getInstance().localNotif(notif);
+    this.props.actions.cleanNewNotifications();
   }
 
   subscribe() {
@@ -154,8 +155,10 @@ class HomePage extends Component {
           badge={{
             textStyle: {color: 'green'},
           }}
-          title={`${item.name}`}
-          subtitle={item.email}
+          title={`${
+            !isEmpty(item.name.replace(/\s/g, '')) ? item.name : item.email
+          }`}
+          subtitle={item.mobile}
           leftAvatar={
             <Avatar
               rounded
@@ -173,14 +176,6 @@ class HomePage extends Component {
   _keyExtractor = (item, index) => index.toString();
 
   render() {
-    if (this.props.newNotification) {
-      PushNotification.localNotification({
-        title: this.props.newNotification.title,
-        message: this.props.newNotification.subtitle,
-      });
-      this.props.actions.cleanNewNotifications();
-    }
-
     const {clampedScroll} = this.state;
 
     const navbarTranslate = clampedScroll.interpolate({

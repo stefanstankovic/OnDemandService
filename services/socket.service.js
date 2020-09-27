@@ -24,11 +24,13 @@ export default class SocketService {
         query: {
           token: authToken,
         },
+        /*
         reconnectionDelay: 1000,
         reconnection: true,
         forceNew: true,
         reconnectionAttempts: Infinity,
         jsonp: false,
+        */
       });
 
       //await AsyncStorage.setItem('web-socket', this.socket);

@@ -4,6 +4,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   ImageBackground,
+  ActivityIndicator,
 } from 'react-native';
 import {Input, Icon, Button} from 'react-native-elements';
 
@@ -72,7 +73,7 @@ class HireRequestPage extends Component {
     );
   }
 
-  render() {
+  componentDidUpdate() {
     if (
       this.state.hiringWorker &&
       !this.props.isLoading &&
@@ -80,7 +81,16 @@ class HireRequestPage extends Component {
     ) {
       Actions.pop({hiredWorker: true, workerId: this.props.hiredWorkerId});
     }
+  }
 
+  render() {
+    if (this.props.isLoading) {
+      return (
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" />
+        </View>
+      );
+    }
     return (
       <KeyboardAvoidingView style={styles.container}>
         <ImageBackground

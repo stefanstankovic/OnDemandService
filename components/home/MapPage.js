@@ -19,7 +19,7 @@ class MapPage extends Component {
   constructor(props) {
     super(props);
     this.state = {};
-    this.onRegionChange = this.onRegionChange.bind(this);
+    //this.onRegionChange = this.onRegionChange.bind(this);
   }
 
   findMe() {
@@ -54,6 +54,12 @@ class MapPage extends Component {
   }
 
   drawPoly(workers) {
+    /*
+    if (this.regionChangedInterval) {
+      clearInterval(this.regionChangedInterval);
+    }
+    */
+
     let workersWithLocation = workers.filter(
       worker => worker.location.length > 0,
     );
@@ -91,7 +97,7 @@ class MapPage extends Component {
       );
     });
   }
-
+  /*
   onRegionChange(region) {
     if (this.regionChangedInterval) {
       clearInterval(this.regionChangedInterval);
@@ -100,6 +106,7 @@ class MapPage extends Component {
       this.setState({region});
     }, 1000);
   }
+  */
 
   render() {
     const {height: windowHeight} = Dimensions.get('window');
@@ -136,7 +143,7 @@ class MapPage extends Component {
           provider={PROVIDER_GOOGLE}
           style={styles.map}
           region={this.state.region}
-          onRegionChange={this.onRegionChange}
+          onRegionChange={region => (this.state.region = region)}
           showsUserLocation={true}>
           {this.addMarkers(this.props.workers)}
           {this.drawPoly(this.props.workers)}

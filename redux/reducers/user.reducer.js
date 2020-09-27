@@ -40,7 +40,7 @@ export function user(state = initialState, action) {
     case types.REGISTER_REQUEST:
       return {
         ...state,
-        isLoading: false,
+        isLoading: true,
       };
     case types.REGISTER_SUCCESS:
       return {

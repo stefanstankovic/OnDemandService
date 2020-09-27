@@ -44,7 +44,6 @@ function subscribeOnLocationChange() {
     SocketService.getInstance()
       .getSocket()
       .on('location.changed', (...args) => {
-        console.log(JSON.stringify(args[0]));
         dispatch({type: types.LOCATION_CHANGED, newLocation: args[0]});
       });
   };

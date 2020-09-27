@@ -3,14 +3,14 @@ import {API_BASE} from '../config';
 import {set, isNull} from 'lodash';
 import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
 
-//import Geolocation from '@react-native-community/geolocation';
-import * as TaskManager from 'expo-task-manager';
-import * as Location from 'expo-location';
+import Geolocation from '@react-native-community/geolocation';
+//import * as TaskManager from 'expo-task-manager';
+//import * as Location from 'expo-location';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import {ASYNC_STORE_KEYS, USER_ROLE} from '../components/common/constants';
 
-const LOCATION_TASK_NAME = 'background-location-task';
+//const LOCATION_TASK_NAME = 'background-location-task';
 
 export const locationService = {
   addNewLocation,
@@ -93,7 +93,7 @@ async function startWatchLocation() {
   if (!(await getPermissions())) {
     return;
   }
-  /*
+
   const watchID = Geolocation.watchPosition(
     async ({coords}) => {
       const {latitude, longitude} = coords;
@@ -105,7 +105,7 @@ async function startWatchLocation() {
     },
     error => console.log(JSON.stringify(error)),
     {
-      distanceFilter: 100,
+      distanceFilter: 20,
       enableHighAccuracy: true,
     },
   );
@@ -114,8 +114,8 @@ async function startWatchLocation() {
     ASYNC_STORE_KEYS.GEOLOCATION_WATCH_ID,
     watchID.toString(),
   );
-  */
 
+  /*
   if (TaskManager.isTaskDefined(LOCATION_TASK_NAME)) {
     return;
   }
@@ -141,15 +141,16 @@ async function startWatchLocation() {
     distanceInterval: 100,
     showsBackgroundLocationIndicator: true,
   });
+  */
 }
 
 async function clearWatchLocation() {
-  /*
   const watchID = await AsyncStorage.getItem(
     ASYNC_STORE_KEYS.GEOLOCATION_WATCH_ID,
   );
   Geolocation.clearWatch(watchID);
-  */
+
+  /*
   if (!TaskManager.isTaskDefined(LOCATION_TASK_NAME)) {
     return;
   }
@@ -158,6 +159,7 @@ async function clearWatchLocation() {
     await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
     await TaskManager.unregisterTaskAsync(LOCATION_TASK_NAME);
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
+  */
 }

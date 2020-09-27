@@ -141,6 +141,10 @@ class ProfileViewPage extends Component {
               refreshing={this.state.refreshing}
               onRefresh={() => {
                 this.setState({refreshing: true});
+                this.props.actions.ranksForWorker(
+                  this.props.worker.id,
+                  this.props.authToken,
+                );
                 setTimeout(() => this.setState({refreshing: false}), 1000);
               }}
               // Android offset for RefreshControl

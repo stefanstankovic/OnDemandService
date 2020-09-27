@@ -54,6 +54,17 @@ class NotificationsDetailsPage extends Component {
     );
   }
 
+  componentDidUpdate() {
+    if (
+      !this.props.isLoading &&
+      this.state.respiringOnNotification &&
+      isUndefined(this.props.workerError) &&
+      isUndefined(this.rankError)
+    ) {
+      Actions.notificationsScreen();
+    }
+  }
+
   getNotificationName(type) {
     switch (type) {
       case constants.NOTIFICATION_TYPE.HIRE_REQUEST:
@@ -282,7 +293,7 @@ class NotificationsDetailsPage extends Component {
         if (additionalInfo.ranked) {
           return (
             <Text style={formStyles.description}>
-              You have already aded your rank!
+              You have already added your rank!
             </Text>
           );
         }
@@ -464,15 +475,6 @@ class NotificationsDetailsPage extends Component {
   }
 
   render() {
-    // if (
-    //   !this.props.workerIsLoading &&
-    //   !this.props.rankIsLoading &&
-    //   this.state.respiringOnNotification &&
-    //   isUndefined(this.props.workerError) &&
-    //   isUndefined(this.rankError)
-    // ) {
-    //   Actions.pop();
-    // }
     return this.renderScreen(this.props.isLoading);
   }
 }
@@ -481,10 +483,11 @@ function mapStateToProps(state) {
   return {
     notification: state.notification.notification,
     additionalInfo: state.notification.additionalInfo,
-    isLoading: state.notification.isLoading,
+    isLoading:
+      state.notification.isLoading ||
+      state.workers.isLoading ||
+      state.rank.isLoading,
     authToken: state.user.token,
-    workerIsLoading: state.workers.isLoading,
-    rankIsLoading: state.rank.isLoading,
     workerError: state.workers.error,
     rankError: state.rank.error,
   };

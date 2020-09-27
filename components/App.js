@@ -1,4 +1,5 @@
 import React from 'react';
+import {StatusBar} from 'react-native';
 import {Router, Scene} from 'react-native-router-flux';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -28,6 +29,11 @@ import AsyncStorage from '@react-native-community/async-storage';
 import * as constants from './common/constants';
 import {isNull} from 'lodash';
 import {userActions} from '../redux/actions/user.actions';
+import {notificationActions} from '../redux/actions/notifications.actions';
+import {locationActions} from '../redux/actions/location.actions';
+import {workersActions} from '../redux/actions/workers.actions';
+
+import NotificationService from '../services/pushNotification.service';
 
 class App extends React.Component {
   constructor(props) {
@@ -53,6 +59,7 @@ class App extends React.Component {
 
   appIsStarted() {
     this.setState({isStarting: false});
+    StatusBar.setHidden(true);
   }
 
   render() {
@@ -82,14 +89,14 @@ class App extends React.Component {
               title="Home"
               tabs={true}
               tabBarStyle={styles.tabBar}
-              hideNavBar
+              hideNavBar={true}
               path="/home"
               initial={!this.state.isStarting && this.props.loggedIn}>
               <Scene
                 key="homeScreen"
                 tabBarLabel="Home"
                 gesturesEnabled={false}
-                hideNavBar
+                hideNavBar={true}
                 component={HomePage}
                 icon={({focused}) => {
                   return (
@@ -102,6 +109,10 @@ class App extends React.Component {
                     />
                   );
                 }}
+                onEnter={() =>
+                  this.props.loggedIn &&
+                  this.props.actions.allAvailableWorkers(this.props.authToken)
+                }
               />
               <Scene
                 hideNavBar
@@ -119,6 +130,10 @@ class App extends React.Component {
                     />
                   );
                 }}
+                onEnter={() =>
+                  this.props.loggedIn &&
+                  this.props.actions.allWorkers(this.props.authToken)
+                }
               />
               <Scene
                 hideNavBar
@@ -135,6 +150,11 @@ class App extends React.Component {
                       color={focused ? colors.activeTab : colors.tabIcon}
                     />
                   );
+                }}
+                onEnter={props => {
+                  this.props.loggedIn &&
+                    this.props.actions.allNotifications(this.props.authToken);
+                  NotificationService.getInstance().clearAllNotifications();
                 }}
               />
             </Scene>
@@ -183,6 +203,7 @@ class App extends React.Component {
 function mapStateToProps(state) {
   return {
     loggedIn: state.user.loggedIn,
+    authToken: state.user.token,
   };
 }
 
@@ -191,6 +212,15 @@ function mapDispatchToProps(dispatch) {
     actions: {
       clear: bindActionCreators(alertActions.clear, dispatch),
       setUser: bindActionCreators(userActions.setUser, dispatch),
+      allNotifications: bindActionCreators(
+        notificationActions.allNotifications,
+        dispatch,
+      ),
+      allWorkers: bindActionCreators(locationActions.allWorkers, dispatch),
+      allAvailableWorkers: bindActionCreators(
+        workersActions.allWorkers,
+        dispatch,
+      ),
     },
   };
 }
